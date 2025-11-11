@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carnet d'Explorateur</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icone.png"> 
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div id="app-container">
+        
+        <header>
+            <h1>Carnet d'Explorateur IA</h1>
+            <div id="boussole">🧭</div> 
+            
+            <button id="btn-parametres">⚙️ Paramètres (Modules)</button>
+        </header>
+
+        <main>
+            <p>Bienvenue ! Veuillez utiliser le bouton de paramètres pour choisir votre mode d'exploration.</p>
+        </main>
+        
+        <section id="saisie-utilisateur">
+        </section>
+
+    </div>
+
+    <div id="modal-parametres" class="modal-cache">
+        <div class="modal-contenu">
+            <h2>⚙️ Réglages & Modules d'Exploration</h2>
+            <p>Choisissez les fonctionnalités que vous souhaitez activer pour votre session :</p>
+            
+            <div class="groupe-modules">
+                <h3>Mode de Base</h3>
+                <label>
+                    <input type="checkbox" id="module-exploration" checked>
+                    **Exploration Thématique** (Ex: Les lacs, les insectes)
+                </label>
+                <p class="description-module">Permet de lancer une étude sur un grand thème sans avoir besoin d'une photo précise.</p>
+                
+                <label>
+                    <input type="checkbox" id="module-determination">
+                    **Détermination/Identification** (Via photo ou nom)
+                </label>
+                <p class="description-module">Permet d'identifier une espèce ou un lieu précis à partir d'une photo fournie.</p>
+            </div>
+            
+            <button id="btn-fermer-modal">Fermer & Enregistrer</button>
+        </div>
+    </div>
+    <script>
+        // --- 1. CONFIGURATION DE BASE ---
+        
+        // ** CLÉ API (Insérée) **
+        const GEMINI_API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE"; // Votre clé API
+        
+        // L'URL de l'API Gemini
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+
+        // --- 2. LOGIQUE DE L'INTERFACE (Ouverture/Fermeture Modale) ---
+        
+        const btnParametres = document.getElementById('btn-parametres');
+        const modalParametres = document.getElementById('modal-parametres');
+        const btnFermerModal = document.getElementById('btn-fermer-modal');
+
+        // Écouteur pour ouvrir la modale
+        if(btnParametres) { // Vérification de l'existence du bouton
+            btnParametres.addEventListener('click', () => {
+                modalParametres.style.display = 'block';
+                modalParametres.classList.remove('modal-cache');
+            });
+        }
+        
+        // Écouteur pour fermer la modale et lancer le test API
+        if(btnFermerModal) { // Vérification de l'existence du bouton de fermeture
+            btnFermerModal.addEventListener('click', () => {
+                modalParametres.style.display = 'none';
+                modalParametres.classList.add('modal-cache');
+                // Lancement du test de connexion API
+                testerConnexionGemini(); 
+            });
+        }
+
+
+        // --- 3. FONCTION DE TEST GEMINI ---
+        
+        function testerConnexionGemini() {
+            // Le prompt très simple pour tester la connexion
+            const testPrompt = "Donne-moi une brève anecdote scientifique sur l'érable en une phrase.";
+            
+            console.log("Tentative de connexion à Gemini...");
+            
+            fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{ role: "user", parts: [{ text: testPrompt }] }]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const reponseGemini = data.candidates[0].content.parts[0].text;
+                
+                const mainArea = document.querySelector('main');
+                mainArea.innerHTML = `
+                    <h2>✅ Connexion Réussie !</h2>
+                    <p><strong>Question :</strong> ${testPrompt}</p>
+                    <p style="color: green; border: 1px dashed green; padding: 10px;">
+                        <strong>Réponse de Gemini :</strong> ${reponseGemini}
+                    </p>
+                `;
+            })
+            .catch(error => {
+                const mainArea = document.querySelector('main');
+                mainArea.innerHTML = `
+                    <h2>❌ Échec de la Connexion API</h2>
+                    <p style="color: red; border: 1px dashed red; padding: 10px;">
+                        <strong>Détails :</strong> ${error.message}. <br>
+                        Vérifiez votre clé API ou l'état du serveur.
+                    </p>
+                `;
+                console.error('Erreur lors de l’appel API Gemini:', error);
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
