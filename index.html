@@ -54,6 +54,9 @@
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
+            <div class="text-xs text-gray-500 mt-2 text-center">
+                Utilise la clé API Gemini valide
+            </div>
         </div>
     </div>
 
@@ -63,23 +66,9 @@
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
 
-        // REMPLACE PAR TA VRAIE CLÉ API
+        // ⚠️ REMPLACE CECI PAR TA VRAIE CLÉ API GEMINI ⚠️
         const API_KEY = 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE';
-        
-        // Essayer différents modèles selon la disponibilité
-        const MODELS = [
-            'gemini-1.5-pro-latest',
-            'gemini-1.0-pro-latest', 
-            'gemini-pro',
-            'models/gemini-pro'
-        ];
-
-        let currentModelIndex = 0;
-
-        function getCurrentAPIUrl() {
-            const model = MODELS[currentModelIndex];
-            return `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${API_KEY}`;
-        }
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
 
         function addMessage(message, isUser = false, isError = false) {
             const messageDiv = document.createElement('div');
@@ -129,7 +118,7 @@
             showTypingIndicator();
             
             try {
-                const response = await fetch(getCurrentAPIUrl(), {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -143,32 +132,27 @@
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
                 hideTypingIndicator();
 
-                console.log('Réponse API:', data);
+                console.log('Réponse API complète:', data);
 
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     const botResponse = data.candidates[0].content.parts[0].text;
                     addMessage(botResponse, false);
-                } else if (data.error && data.error.message.includes('not found')) {
-                    // Essayer le modèle suivant
-                    currentModelIndex++;
-                    if (currentModelIndex < MODELS.length) {
-                        addMessage(`🔄 Essai avec un autre modèle... (${MODELS[currentModelIndex]})`, false);
-                        await sendMessageToGemini(message);
-                    } else {
-                        addMessage('❌ Aucun modèle Gemini disponible. Vérifie ta clé API.', false, true);
-                    }
                 } else if (data.error) {
-                    addMessage(`❌ Erreur: ${data.error.message}`, false, true);
+                    addMessage(`❌ Erreur API: ${data.error.message}`, false, true);
                 } else {
-                    addMessage("⚠️ Réponse inattendue de l'API", false, true);
+                    addMessage("⚠️ Format de réponse inattendu", false, true);
                 }
             } catch (error) {
                 hideTypingIndicator();
-                addMessage("🔌 Erreur de connexion - Vérifie ta clé API et ta connexion", false, true);
-                console.error('Erreur:', error);
+                addMessage(`🔌 Erreur: ${error.message}`, false, true);
+                console.error('Erreur détaillée:', error);
             }
         }
 
@@ -198,7 +182,9 @@
 
         messageInput.focus();
 
-        console.log('🚀 Chat Gemini prêt - Modèles disponibles:', MODELS);
+        // Vérification de la clé API
+        console.log('🔑 Clé API configurée:', API_KEY !== 'TA_CLE_API_GEMINI' ? 'OUI' : 'NON - À REMPLACER');
+        console.log('📡 URL API:', API_URL);
     </script>
 </body>
 </html>
