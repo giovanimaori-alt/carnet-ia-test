@@ -8,6 +8,14 @@ body {
     padding: 0;
     background-color: #f7f3e8; /* Couleur de fond papier ancien/jauni */
     color: #3e3831; /* Couleur du texte (encre) */
+    
+    /* MODIFICATION POUR HAUTEUR/CENTRE */
+    display: flex; /* Active Flexbox pour le centrage */
+    justify-content: center; /* Centre horizontalement le contenu */
+    align-items: flex-start; /* Aligne le contenu en haut de la page */
+    min-height: 100vh; /* La hauteur minimale est celle de l'écran */
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 /* ----------------------------------- */
@@ -15,8 +23,8 @@ body {
 /* ----------------------------------- */
 #app-container {
     width: 95%;
-    max-width: 600px;
-    margin: 20px auto;
+    max-width: 600px; /* Moins large, max 600px */
+    margin: 0; /* Enlève la marge auto remplacée par le flexbox du body */
     padding: 30px 25px;
     background-color: #fffaf0; /* Blanc cassé, couleur du papier */
     border: 1px solid #c9c3b1;
@@ -40,6 +48,14 @@ main {
 main h2 {
     font-size: 1.4em;
     margin-top: 0;
+}
+
+/* Style de la zone de réponse de Gemini (la boîte en pointillé) */
+.gemini-response {
+    border: 1px dashed green;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: #f1fff1; /* Fond très léger pour la réponse */
 }
 
 
@@ -86,12 +102,39 @@ h1 {
 }
 
 /* ----------------------------------- */
-/* 5. ÉLÉMENTS DE SAISIE FUTURS */
+/* 5. ÉLÉMENTS DE SAISIE */
 /* ----------------------------------- */
 #saisie-utilisateur {
     padding-top: 20px;
     text-align: center;
 }
+
+#user-input {
+    width: 95%; /* Prend presque toute la largeur du conteneur */
+    padding: 10px;
+    border: 1px solid #c9c3b1;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    resize: vertical; /* Permet uniquement le redimensionnement vertical */
+    font-family: 'Courier New', monospace;
+}
+
+#btn-envoyer {
+    background-color: #3e3831; /* Bouton foncé pour l'action principale */
+    color: #fffaf0;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+#btn-envoyer:hover {
+    background-color: #555;
+}
+
 
 /* ----------------------------------- */
 /* 6. STYLE DE LA FENÊTRE MODALE (PARAMÈTRES) */
