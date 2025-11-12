@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat avec Gemini</title>
+    <title>L’Aventurier</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -55,7 +55,7 @@
                 </button>
             </div>
             <div class="text-xs text-gray-500 mt-2 text-center">
-                Clé API: <span id="apiStatus" class="font-mono">⚠️ Non configurée</span>
+                Clé API: <span id="apiStatus" class="font-mono">✅ Configurée</span>
             </div>
         </div>
     </div>
@@ -65,19 +65,15 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
-        const apiStatus = document.getElementById('apiStatus');
 
-        // ⚠️ REMPLACE UNIQUEMENT CETTE LIGNE PAR TA CLÉ API ⚠️
-        const API_KEY = 'TA_CLE_API_GEMINI';
+        // ⚠️ TA CLÉ API ICI ⚠️
+        const API_KEY = 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE'; // Remplace par ta vraie clé
         
-        // URL corrigée - version stable de l'API
+        // URL de l'API
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
 
-        // Met à jour le statut de la clé API
-        if (API_KEY !== 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE') {
-            apiStatus.textContent = '✅ Configurée';
-            apiStatus.className = 'font-mono text-green-600';
-        }
+        // Vérification simple de la clé
+        const isApiKeyConfigured = API_KEY && API_KEY !== 'TA_CLE_API_GEMINI' && API_KEY.length > 20;
 
         function addMessage(message, isUser = false, isError = false) {
             const messageDiv = document.createElement('div');
@@ -124,8 +120,8 @@
         }
 
         async function sendMessageToGemini(message) {
-            // Vérification de la clé API
-            if (API_KEY === 'TA_CLE_API_GEMINI') {
+            // Vérification CORRIGÉE de la clé API
+            if (!isApiKeyConfigured) {
                 addMessage("❌ Clé API non configurée - Remplace 'TA_CLE_API_GEMINI' par ta vraie clé", false, true);
                 return;
             }
@@ -133,7 +129,7 @@
             showTypingIndicator();
             
             try {
-                console.log('📡 Envoi vers:', API_URL);
+                console.log('📡 Envoi vers Gemini...');
                 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -152,25 +148,26 @@
                 console.log('📨 Statut réponse:', response.status);
 
                 if (!response.ok) {
-                    throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+                    const errorText = await response.text();
+                    throw new Error(`Erreur HTTP ${response.status}: ${errorText}`);
                 }
 
                 const data = await response.json();
                 hideTypingIndicator();
 
-                console.log('✅ Réponse API:', data);
+                console.log('✅ Réponse API reçue');
 
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     const botResponse = data.candidates[0].content.parts[0].text;
                     addMessage(botResponse, false);
                 } else if (data.error) {
-                    addMessage(`❌ Erreur: ${data.error.message}`, false, true);
+                    addMessage(`❌ Erreur API: ${data.error.message}`, false, true);
                 } else {
-                    addMessage("⚠️ Réponse inattendue de l'API", false, true);
+                    addMessage("⚠️ Format de réponse inattendu", false, true);
                 }
             } catch (error) {
                 hideTypingIndicator();
-                addMessage(`🔌 ${error.message}`, false, true);
+                addMessage(`🔌 Erreur: ${error.message}`, false, true);
                 console.error('❌ Erreur détaillée:', error);
             }
         }
@@ -201,10 +198,20 @@
 
         messageInput.focus();
 
-        // Debug
+        // Debug initial
         console.log('🚀 Chat Gemini initialisé');
-        console.log('🔑 Clé API:', API_KEY !== 'TA_CLE_API_GEMINI' ? '✅ Configurée' : '❌ Non configurée');
+        console.log('🔑 Clé API configurée:', isApiKeyConfigured);
         console.log('📡 URL API:', API_URL);
+        
+        // Met à jour le statut affiché
+        const apiStatus = document.getElementById('apiStatus');
+        if (isApiKeyConfigured) {
+            apiStatus.textContent = '✅ Configurée';
+            apiStatus.className = 'font-mono text-green-600';
+        } else {
+            apiStatus.textContent = '❌ Non configurée';
+            apiStatus.className = 'font-mono text-red-600';
+        }
     </script>
 </body>
 </html>
