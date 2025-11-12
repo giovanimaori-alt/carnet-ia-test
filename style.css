@@ -298,4 +298,20 @@ body {
 .hidden { display:none !important; }
 .center { display:flex; align-items:center; justify-content:center; }
 
+/* Contenu déplacé depuis index.html */
+body {
+  background: #f4f6f8;
+  font-family: system-ui, sans-serif;
+}
+
+.tab-btn {
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.tab-btn.active {
+  color: #2563eb;
+  border-bottom: 4px solid #2563eb;
+}
+
 /* end of file */
