@@ -16,8 +16,8 @@ body {
     display: flex; /* Active Flexbox pour le centrage */
     justify-content: center; /* Centre horizontalement le contenu */
     align-items: flex-start; /* Aligne le contenu en haut de la page */
-    min-height: 100vh; /* La hauteur minimale est celle de l'écran */
-    padding-top: 10px; /* MODIFIÉ: Réduit l'espace en haut du body */
+    min-height: 100vh; 
+    padding-top: 5px; /* MODIFIÉ: ENCORE PLUS RÉDUIT l'espace en haut du body */
     padding-bottom: 20px;
 }
 
@@ -26,14 +26,13 @@ body {
 /* ----------------------------------- */
 #app-container {
     width: 95%;
-    max-width: 600px; /* Moins large, max 600px */
-    margin: 0; /* Enlève la marge auto remplacée par le flexbox du body */
-    padding: 20px 25px; /* MODIFIÉ: Réduit le padding interne du conteneur */
-    background-color: #fffaf0; /* Blanc cassé, couleur du papier */
+    max-width: 600px;
+    margin: 0;
+    padding: 20px 25px; 
+    background-color: #fffaf0; 
     border: 1px solid #c9c3b1;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); /* Ombre légère pour l'effet relief */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); 
     position: relative;
-    /* Imite l'effet d'une page qui a été tenue */
     border-radius: 5px; 
 }
 
@@ -42,13 +41,13 @@ body {
 /* ----------------------------------- */
 main {
     padding: 20px 0;
-    border-top: 1px dashed #c9c3b1; /* Ligne de séparation */
-    border-bottom: 1px dashed #c9c3b1; /* Ligne de séparation */
+    border-top: 1px dashed #c9c3b1; 
+    border-bottom: 1px dashed #c9c3b1; 
     line-height: 1.6;
-    /* Rendre la zone de messages défilable */
-    max-height: 55vh; /* AUGMENTÉ: Laisse plus de place pour l'historique */
+    max-height: 55vh; 
     overflow-y: auto; 
     scroll-behavior: smooth;
+    text-align: left; /* MODIFIÉ: Centre le contenu du chat dans la console */
 }
 
 /* Styles pour les messages de succès/échec de l'API */
@@ -62,7 +61,7 @@ main h2 {
     border: 1px dashed green;
     padding: 10px;
     margin-top: 15px;
-    background-color: #f1fff1; /* Fond très léger pour la réponse */
+    background-color: #f1fff1;
 }
 .user-message {
     margin-top: 15px;
@@ -80,16 +79,17 @@ main h2 {
 /* 4. EN-TÊTE ET BOUTONS */
 /* ----------------------------------- */
 header {
-    text-align: center;
-    padding-bottom: 10px; /* MODIFIÉ: Réduit l'espace sous le bouton Paramètres */
+    text-align: left; /* MODIFIÉ: Aligne le titre à gauche */
+    padding-bottom: 5px; /* MODIFIÉ: Réduit l'espace sous le bouton Paramètres */
     border-bottom: 3px double #7a736a;
-    margin-bottom: 15px; /* MODIFIÉ: Rapproche le contenu principal */
+    margin-bottom: 10px; /* MODIFIÉ: Rapproche le contenu principal */
 }
 
 h1 {
     font-size: 1.5em;
-    margin-top: 0; /* REMONTÉ: Supprime la marge par défaut en haut du titre */
-    margin-bottom: 5px; /* MODIFIÉ: Rapproche le bouton Paramètres du titre */
+    margin-top: 0; 
+    margin-bottom: 5px; 
+    display: inline-block; /* Permet de le décaler à gauche sans prendre toute la ligne */
 }
 
 #boussole {
@@ -104,13 +104,15 @@ h1 {
     background-color: #7a736a;
     color: #fffaf0;
     border: none;
-    padding: 5px 10px; /* MODIFIÉ: Rapproche le bouton Paramètres du titre (hauteur/largeur réduites) */
-    border-radius: 20px;
+    padding: 3px 8px; /* MODIFIÉ: ENCORE PLUS PETIT (3px haut/bas) */
+    border-radius: 15px; /* Légèrement plus petit */
     cursor: pointer;
     font-family: 'Courier New', monospace;
     font-weight: bold;
-    font-size: 0.9em; /* MODIFIÉ: Réduit la taille de la police */
-    margin-top: 0; /* Enlève la marge du haut pour le rapprocher */
+    font-size: 0.8em; /* MODIFIÉ: ENCORE PLUS PETIT */
+    margin-top: 0; 
+    margin-left: 10px; /* Ajout d'une petite marge pour le séparer du titre */
+    display: block; /* Permet de le placer correctement */
     text-align: center;
 }
 
@@ -124,13 +126,18 @@ h1 {
 /* 5. ÉLÉMENTS DE SAISIE */
 /* ----------------------------------- */
 #saisie-utilisateur {
-    padding-top: 20px;
+    padding-top: 15px; /* MODIFIÉ: Réduit l'espace */
     text-align: center;
 }
 
+/* Masque le titre "Votre Question" (qui est un h2) */
+#saisie-utilisateur h2 {
+    display: none; 
+}
+
 #user-input {
-    width: 100%; /* Pleine largeur */
-    min-height: 3em; /* Hauteur minimale de 3 lignes */
+    width: 100%; 
+    min-height: 3em; 
     padding: 10px;
     border: 1px solid #c9c3b1;
     border-radius: 5px;
