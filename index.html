@@ -17,7 +17,6 @@
         
         <!-- Messages Container -->
         <div id="chatMessages" class="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-3">
-            <!-- Message de bienvenue -->
             <div class="flex justify-start">
                 <div class="bg-white border border-gray-200 rounded-2xl rounded-bl-none px-4 py-3 max-w-[80%] shadow-sm">
                     <div class="font-medium text-blue-500 text-sm mb-1">Gemini</div>
@@ -28,9 +27,13 @@
 
         <!-- Typing Indicator -->
         <div id="typingIndicator" class="hidden px-4 py-2 bg-gray-50">
-            <div class="text-gray-500 text-sm italic">
-                <i class="fas fa-ellipsis-h mr-2"></i>
-                Gemini écrit...
+            <div class="flex items-center text-gray-500 text-sm">
+                <div class="flex space-x-1 mr-2">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+                Gemini réfléchit...
             </div>
         </div>
         
@@ -55,29 +58,47 @@
     </div>
 
     <script>
-        // Elements DOM
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
 
-        // Configuration Gemini - REMPLACE PAR TA CLÉ API
+        // REMPLACE PAR TA VRAIE CLÉ API
         const API_KEY = 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE';
-        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+        
+        // Essayer différents modèles selon la disponibilité
+        const MODELS = [
+            'gemini-1.5-pro-latest',
+            'gemini-1.0-pro-latest', 
+            'gemini-pro',
+            'models/gemini-pro'
+        ];
 
-        // Ajouter un message au chat
-        function addMessage(message, isUser = false) {
+        let currentModelIndex = 0;
+
+        function getCurrentAPIUrl() {
+            const model = MODELS[currentModelIndex];
+            return `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${API_KEY}`;
+        }
+
+        function addMessage(message, isUser = false, isError = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
             
             const messageBubble = document.createElement('div');
-            messageBubble.className = `px-4 py-3 rounded-2xl max-w-[80%] shadow-sm ${
-                isUser 
-                    ? 'bg-blue-500 text-white rounded-br-none' 
-                    : 'bg-white border border-gray-200 rounded-bl-none'
-            }`;
+            let bubbleClasses = `px-4 py-3 rounded-2xl max-w-[80%] shadow-sm `;
             
-            if (!isUser) {
+            if (isUser) {
+                bubbleClasses += 'bg-blue-500 text-white rounded-br-none';
+            } else if (isError) {
+                bubbleClasses += 'bg-red-100 border border-red-300 text-red-700 rounded-bl-none';
+            } else {
+                bubbleClasses += 'bg-white border border-gray-200 rounded-bl-none';
+            }
+            
+            messageBubble.className = bubbleClasses;
+            
+            if (!isUser && !isError) {
                 const senderDiv = document.createElement('div');
                 senderDiv.className = 'font-medium text-blue-500 text-sm mb-1';
                 senderDiv.textContent = 'Gemini';
@@ -92,27 +113,23 @@
             messageDiv.appendChild(messageBubble);
             chatMessages.appendChild(messageDiv);
             
-            // Scroll vers le bas
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Afficher l'indicateur de frappe
         function showTypingIndicator() {
             typingIndicator.classList.remove('hidden');
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Cacher l'indicateur de frappe
         function hideTypingIndicator() {
             typingIndicator.classList.add('hidden');
         }
 
-        // Envoyer un message à Gemini
         async function sendMessageToGemini(message) {
             showTypingIndicator();
             
             try {
-                const response = await fetch(API_URL, {
+                const response = await fetch(getCurrentAPIUrl(), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -134,29 +151,35 @@
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     const botResponse = data.candidates[0].content.parts[0].text;
                     addMessage(botResponse, false);
+                } else if (data.error && data.error.message.includes('not found')) {
+                    // Essayer le modèle suivant
+                    currentModelIndex++;
+                    if (currentModelIndex < MODELS.length) {
+                        addMessage(`🔄 Essai avec un autre modèle... (${MODELS[currentModelIndex]})`, false);
+                        await sendMessageToGemini(message);
+                    } else {
+                        addMessage('❌ Aucun modèle Gemini disponible. Vérifie ta clé API.', false, true);
+                    }
                 } else if (data.error) {
-                    addMessage(`❌ Erreur: ${data.error.message}`, false);
+                    addMessage(`❌ Erreur: ${data.error.message}`, false, true);
                 } else {
-                    addMessage("⚠️ Format de réponse inattendu", false);
+                    addMessage("⚠️ Réponse inattendue de l'API", false, true);
                 }
             } catch (error) {
                 hideTypingIndicator();
-                addMessage("🔌 Erreur de connexion - Vérifie ta clé API", false);
+                addMessage("🔌 Erreur de connexion - Vérifie ta clé API et ta connexion", false, true);
                 console.error('Erreur:', error);
             }
         }
 
-        // Envoyer un message
         function sendMessage() {
             const message = messageInput.value.trim();
             if (message === '') return;
 
-            // Ajouter le message de l'utilisateur
             addMessage(message, true);
             messageInput.value = '';
             sendButton.disabled = true;
 
-            // Envoyer à Gemini
             sendMessageToGemini(message);
         }
 
@@ -173,11 +196,9 @@
             sendButton.disabled = messageInput.value.trim() === '';
         });
 
-        // Focus automatique sur l'input
         messageInput.focus();
 
-        // Debug
-        console.log('🚀 Chat Gemini prêt - Pense à mettre ta clé API!');
+        console.log('🚀 Chat Gemini prêt - Modèles disponibles:', MODELS);
     </script>
 </body>
 </html>
