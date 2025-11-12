@@ -143,3 +143,11 @@ footer {
 div, header, button, textarea {
   transition: all 0.3s ease;
 }
+
+#tabs button {
+  border-right: 1px solid #d2c9b8; /* très léger pour séparer */
+}
+
+#tabs button:last-child {
+  border-right: none;
+}
