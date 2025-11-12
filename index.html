@@ -3,84 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat – Carnet d’aventure</title>
+  <title>Module Chat</title>
+
+  <!-- TAILWIND CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body {
-      background: #f4f6f8;
       font-family: system-ui, sans-serif;
+      background: #f5f7fa;
     }
   </style>
 </head>
+<body class="min-h-screen flex flex-col items-center justify-center p-6">
 
-<body class="h-screen flex flex-col justify-center items-center p-4">
+  <div class="w-full max-w-lg">
 
-  <!-- MODULE CHAT AVEC CADRE BLEU -->
-  <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-[4px] border-blue-600">
+    <!-- CARD GLOBALE AVEC CADRE BLEU -->
+    <div class="border-2 border-blue-500 rounded-2xl shadow-xl bg-white overflow-hidden">
 
-    <!-- HEADER -->
-    <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
-      <h1 class="text-xl font-semibold">Carnet d’aventure 1</h1>
-    </header>
-
-    <!-- CHAT WINDOW -->
-    <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
-
-      <!-- Message modèle IA -->
-      <div class="flex items-start gap-2">
-        <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-        <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
-          Salut, je suis Gemini.<br>Envoie un message quand tu veux.
-        </div>
+      <!-- HEADER ARRONDI EN HAUT -->
+      <div class="bg-blue-500 text-white px-5 py-3 rounded-t-2xl">
+        <h2 class="text-lg font-semibold">Assistant IA</h2>
       </div>
 
-      <!-- Message modèle User -->
-      <div class="flex justify-end">
-        <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">
-          Ça marche.
+      <!-- FENÊTRE DE CHAT -->
+      <div class="p-5 space-y-3 bg-white">
+
+        <!-- MESSAGE UTILISATEUR -->
+        <div class="text-right">
+          <p class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-2xl rounded-br-none">
+            Bonjour
+          </p>
         </div>
+
+        <!-- MESSAGE IA -->
+        <div>
+          <p class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-2xl rounded-bl-none">
+            Bonjour, comment puis-je vous aider ?
+          </p>
+        </div>
+
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="border-t px-4 py-3 flex gap-2">
+        <input type="text" placeholder="Écrivez votre message…" class="flex-1 border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <button class="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600">Envoyer</button>
       </div>
 
     </div>
 
-    <!-- INPUT ZONE -->
-    <div class="border-t p-4 bg-white flex items-center gap-3">
-      <textarea id="input" class="flex-1 border rounded-xl p-3 resize-none h-12 focus:ring-2 focus:ring-blue-600 outline-none"
-        placeholder="Écris un message..."></textarea>
+    <!-- COPYRIGHT → EN BAS -->
+    <p class="text-xs text-gray-500 mt-2 text-center">
+      © Conservatoire du Canigou
+    </p>
 
-      <button id="send"
-        class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-3 rounded-xl text-sm font-semibold">
-        ➤
-      </button>
-    </div>
   </div>
-
-  <!-- FOOTER COPYRIGHT -->
-  <div class="text-xs text-gray-500 mt-2 opacity-75 select-none">
-    © Conservatoire du Canigou
-  </div>
-
-  <!-- SCRIPT: ajoute juste le message dans le chat -->
-  <script>
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
-
-    send.addEventListener("click", () => {
-      const text = input.value.trim();
-      if (!text) return;
-
-      // message utilisateur (bulle droite bleue)
-      chat.innerHTML += `
-      <div class="flex justify-end">
-        <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${text}</div>
-      </div>`;
-
-      chat.scrollTop = chat.scrollHeight;
-      input.value = "";
-    });
-  </script>
 
 </body>
 </html>
