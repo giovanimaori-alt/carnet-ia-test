@@ -1,24 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Chat – Carnet d’aventure</title>
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-    body {
-      background: #f4f6f8;
-      font-family: system-ui, sans-serif;
-    }
+    body { background: #f4f6f8; font-family: system-ui, sans-serif; }
   </style>
 </head>
 
 <body class="h-screen flex flex-col justify-center items-center p-4">
 
-  <!-- CHAT MODULE -->
+  <!-- CHAT MODULE (version ancrée) -->
   <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-4 border-blue-600">
 
     <!-- HEADER -->
@@ -28,7 +22,6 @@
 
     <!-- CHAT WINDOW -->
     <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
-      <!-- Message IA modèle -->
       <div class="flex items-start gap-2">
         <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
         <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
@@ -54,25 +47,97 @@
     © Conservatoire du Canigou
   </footer>
 
-  <!-- SCRIPT : ajoute les messages dans le chat -->
+  <!-- SCRIPT : fetch officiel Gemini (JS équivalent au curl fourni) -->
   <script>
+    // ⚠️ Mode test : coller TA_CLE_ICI puis effacer après test
+    const API_KEY = "AIzaSyAOSPp84UoD5V6ZkC6OWFZTRc4PnLkiOt4";
+
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
     const send = document.getElementById("send");
 
-    send.addEventListener("click", () => {
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function appendBubble(text, who='ia', loaderId=null){
+      const safe = esc(text);
+      const html = who === 'user'
+        ? `<div class="flex justify-end"><div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${safe}</div></div>`
+        : `<div class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">${safe}</div></div>`;
+      if(loaderId){
+        const el = document.getElementById(loaderId);
+        if(el) el.outerHTML = html; else chat.innerHTML += html;
+      } else chat.innerHTML += html;
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // --- FETCH officiel, équivalent exact du curl que tu as montré ---
+    async function callGeminiOfficial(prompt) {
+      const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+      const payload = {
+        contents: [
+          { parts: [ { text: prompt } ] }
+        ]
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-goog-api-key": API_KEY   // <-- en-tête exactement comme le curl
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error("HTTP " + res.status + " — " + txt);
+      }
+      return res.json();
+    }
+
+    function extractText(data){
+      try {
+        const c = data?.candidates;
+        if (Array.isArray(c) && c.length) {
+          const cand = c[0];
+          if (cand?.content && Array.isArray(cand.content) && cand.content.length) {
+            const parts = cand.content[0]?.parts || cand.content[0]?.textParts;
+            if (Array.isArray(parts) && parts.length) return parts.map(p => p.text || p).join("").trim();
+          }
+          if (cand?.output_text) return cand.output_text;
+          if (cand?.message?.content?.[0]?.text) return cand.message.content[0].text;
+        }
+        if (data?.output?.[0]?.content?.[0]?.text) return data.output[0].content[0].text;
+        return JSON.stringify(data).slice(0,1000);
+      } catch (e) {
+        return "(réponse non parsée)";
+      }
+    }
+
+    send.addEventListener("click", async () => {
       const text = input.value.trim();
       if (!text) return;
-
-      chat.innerHTML += `
-      <div class="flex justify-end">
-        <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${text}</div>
-      </div>`;
-
-      chat.scrollTop = chat.scrollHeight;
       input.value = "";
+
+      appendBubble(text, "user");
+
+      const loaderId = "ldr-" + Date.now();
+      chat.innerHTML += `<div id="${loaderId}" class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">...</div></div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const data = await callGeminiOfficial(text);
+        const reply = extractText(data);
+        appendBubble(reply, "ia", loaderId);
+      } catch (err) {
+        appendBubble("Erreur : " + (err.message || "échec"), "ia", loaderId);
+        console.error(err);
+      }
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); }
     });
   </script>
-
 </body>
 </html>
