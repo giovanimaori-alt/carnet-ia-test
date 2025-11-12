@@ -80,7 +80,6 @@
 
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-    <script>
 function appendBubble(text, who='ia', loaderId=null) {
   const safe = String(text || '')
     .replace(/&/g,'&amp;')
@@ -110,7 +109,6 @@ function appendBubble(text, who='ia', loaderId=null) {
 
   chat.scrollTop = chat.scrollHeight;
 }
-</script>
 
     async function callGeminiOfficial(prompt) {
       const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
