@@ -31,9 +31,19 @@
             border-top-color: #10b981;
             -webkit-animation: spinner 1s linear infinite;
             animation: spinner 1s linear infinite;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10B981;
+            border-radius: 50%;
+            height: 1.5rem;
+            width: 1.5rem;
+            display: none; /* Caché par défaut */
         }
         @keyframes spinner {
             to {transform: rotate(360deg);}
+        }
+        /* Style pour la zone de réponse */
+        #outputArea {
+            min-height: 150px;
         }
     </style>
 </head>
@@ -46,10 +56,13 @@
         <header class="text-center p-6 bg-emerald-600 text-white shadow-md">
             <h1 class="text-3xl font-bold">Carnet d'Aventurier</h1>
             <p class="text-sm opacity-90 mt-1">Votre guide personnel propulsé par Gemini.</p>
+             <!-- Affichage de l'état de l'utilisateur -->
+            <p id="authStatus" class="text-xs mt-2 p-1 bg-emerald-700 rounded-full inline-block">
+                Authentification...
+            </p>
         </header>
 
         <!-- Zone de sortie (Conseils de l'Oracle) - HAUT et SCROLLABLE -->
-        <!-- J'ajoute un padding plus grand (p-6) et un fond légèrement gris (bg-gray-100) pour séparer visuellement -->
         <div class="flex-grow p-6 overflow-y-auto bg-gray-100 border-b border-gray-200">
             <div id="outputArea" class="prose max-w-none text-gray-700 leading-relaxed space-y-4">
                 <p class="text-gray-500 italic">Bienvenue, aventurier. Décrivez votre situation ci-dessous pour recevoir les conseils de l'Oracle.</p>
@@ -66,7 +79,6 @@
 
         <!-- Zone de saisie (Le Carnet) - BAS (L'input de l'utilisateur) -->
         <div class="p-4 bg-white">
-            <!-- J'ai supprimé le titre h2 pour plus de clarté -->
             <textarea id="promptInput"
                       class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-150 resize-none"
                       rows="3"
@@ -76,24 +88,255 @@
                 <div id="statusMessage" class="text-sm text-red-500 mr-4 mb-2 sm:mb-0 hidden"></div>
                 <button id="generateButton"
                         class="w-full sm:w-auto px-6 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition duration-200 flex items-center justify-center"
+                        onclick="generateContent()"
                         disabled>
                     <span id="buttonText">Lancer l'Analyse</span>
-                    <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 ml-2 hidden"></div>
+                    <div id="loader" class="loader ml-2"></div>
                 </button>
             </div>
         </div>
 
     </div>
 
-    <!-- Script minimal pour l'interface (sera complété plus tard) -->
+    <!-- Firebase Imports -->
     <script type="module">
-        document.getElementById('promptInput').addEventListener('input', function() {
-            const button = document.getElementById('generateButton');
-            button.disabled = this.value.trim() === '';
-        });
-        console.log("Interface rectifiée : meilleure séparation visuelle des zones de sortie et de saisie.");
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase references
+        window.db = null;
+        window.auth = null;
+        window.userId = null;
+        window.isAuthReady = false;
+
+        // Global utility variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const authStatusElement = document.getElementById('authStatus');
+        const promptInput = document.getElementById('promptInput');
+        const generateButton = document.getElementById('generateButton');
+
+        // --- Fonctions Firestore (Connexion/Sauvegarde/Chargement) ---
+
+        // 1. Sauvegarde de la dernière requête de l'utilisateur
+        window.saveLastQuery = async (query) => {
+            if (!window.userId || !window.db) {
+                console.warn("Firestore non prêt pour la sauvegarde.");
+                return;
+            }
+
+            const userDocRef = doc(window.db, "artifacts", appId, "users", window.userId, "settings", "last_adventure_prompt");
+            try {
+                // Sauvegarde de la requête actuelle
+                await setDoc(userDocRef, { lastQuery: query, timestamp: Date.now() }, { merge: true });
+                console.log("Requête sauvegardée pour l'utilisateur:", window.userId);
+            } catch (e) {
+                console.error("Erreur lors de la sauvegarde de la requête:", e);
+            }
+        };
+
+        // 2. Chargement de la dernière requête
+        const loadLastQuery = async () => {
+            if (!window.userId || !window.db) return;
+
+            const userDocRef = doc(window.db, "artifacts", appId, "users", window.userId, "settings", "last_adventure_prompt");
+            try {
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.lastQuery) {
+                        promptInput.value = data.lastQuery;
+                        // Activer le bouton après le chargement si le champ n'est pas vide
+                        if (promptInput.value.trim() !== '') {
+                            generateButton.disabled = false;
+                        }
+                        console.log("Dernière requête chargée:", data.lastQuery);
+                    }
+                }
+            } catch (e) {
+                console.error("Erreur lors du chargement de la requête:", e);
+            }
+        };
+
+        // --- Initialisation Firebase et Authentification ---
+        window.onload = function() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                window.db = getFirestore(app);
+                window.auth = getAuth(app);
+                console.log("Firebase initialisé.");
+
+                onAuthStateChanged(window.auth, async (user) => {
+                    if (user) {
+                        window.userId = user.uid;
+                        authStatusElement.textContent = `Connecté. ID Utilisateur: ${window.userId}`;
+                        window.isAuthReady = true;
+                        loadLastQuery(); 
+                    } else {
+                        authStatusElement.textContent = "Connexion...";
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(window.auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(window.auth);
+                            }
+                        } catch (e) {
+                            console.error("Échec de l'authentification:", e);
+                            authStatusElement.textContent = "Échec de connexion. (Fonctionnalités connectées limitées)";
+                            window.isAuthReady = true; 
+                        }
+                    }
+                });
+
+                // Écouteur pour activer/désactiver le bouton
+                promptInput.addEventListener('input', function() {
+                    generateButton.disabled = this.value.trim() === '';
+                });
+
+            } catch (e) {
+                console.error("Erreur critique d'initialisation:", e);
+                authStatusElement.textContent = "Erreur critique de Firebase. Vérifiez la console.";
+            }
+        };
     </script>
 
+    <!-- Script de Logique de l'Assistant (Non-module pour les fonctions globales) -->
+    <script>
+        // --- Fonction utilitaire pour le backoff exponentiel ---
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429 && i < maxRetries - 1) {
+                            const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        const errorText = await response.text();
+                        throw new Error(`Erreur HTTP ${response.status}: ${errorText}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === maxRetries - 1) {
+                        throw error;
+                    }
+                    console.error(`Erreur lors de la requête (tentative ${i + 1}/${maxRetries}):`, error);
+                }
+            }
+        }
+
+        // --- Logique du PROMPT TEMPORAIRE (Pour les tests) ---
+        function getSystemInstruction() {
+            // Instruction temporaire pour un test simple, en attendant le prompt spécifique du Carnet d'Aventurier.
+            const tempPrompt = `
+            Tu es l'Oracle du Carnet d'Aventurier. Ton rôle est d'apporter des conseils de survie et des options tactiques à l'utilisateur, qui est un aventurier dans un monde fantastique.
+            Réponds toujours avec un ton mystique et motivant, en proposant trois (3) actions claires.
+            `.trim();
+            return tempPrompt;
+        }
+
+        // --- Fonction principale d'exécution de l'Assistant ---
+        window.generateContent = async function() {
+            const promptInput = document.getElementById('promptInput');
+            const outputArea = document.getElementById('outputArea');
+            const statusMessage = document.getElementById('statusMessage');
+            const loader = document.getElementById('loader');
+            const generateButton = document.getElementById('generateButton');
+            const sourcesArea = document.getElementById('sourcesArea');
+            const sourcesList = document.getElementById('sourcesList');
+
+            if (!window.isAuthReady || generateButton.disabled) {
+                statusMessage.textContent = 'Veuillez attendre la connexion et entrer une requête.';
+                statusMessage.classList.remove('hidden');
+                return;
+            }
+
+            const userQuery = promptInput.value.trim();
+
+            // Préparation de l'interface
+            outputArea.innerHTML = '<p class="text-gray-500 italic">Analyse en cours...</p>';
+            statusMessage.classList.add('hidden');
+            sourcesArea.classList.add('hidden');
+            sourcesList.innerHTML = '';
+            
+            // Activation du chargement
+            loader.style.display = 'inline-block';
+            generateButton.disabled = true;
+
+            try {
+                // 1. Sauvegarde de la requête avant l'appel
+                await window.saveLastQuery(userQuery);
+
+                const systemInstruction = getSystemInstruction();
+
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    tools: [{ "google_search": {} }], 
+                    systemInstruction: { parts: [{ text: systemInstruction }] },
+                };
+
+                const options = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                };
+
+                const response = await fetchWithRetry(apiUrl, options);
+                const result = await response.json();
+
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const text = candidate.content.parts[0].text;
+                    outputArea.innerHTML = `<p>${text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`; // Formater la réponse pour l'affichage
+
+                    // Traitement et affichage des sources
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        let sources = groundingMetadata.groundingAttributions
+                            .map(attribution => ({
+                                uri: attribution.web?.uri,
+                                title: attribution.web?.title,
+                            }))
+                            .filter(source => source.uri && source.title);
+
+                        if (sources.length > 0) {
+                            sources.forEach((source, index) => {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">${source.title}</a>`;
+                                sourcesList.appendChild(li);
+                            });
+                            sourcesArea.classList.remove('hidden');
+                        }
+                    }
+
+                    statusMessage.textContent = 'Analyse terminée.';
+                    statusMessage.className = 'text-sm text-green-600 mr-4 mb-2 sm:mb-0';
+
+                } else {
+                    outputArea.innerHTML = '<p class="text-red-500">Erreur : Impossible de recevoir les conseils de l\'Oracle.</p>';
+                    statusMessage.textContent = 'Échec de l\'analyse.';
+                    statusMessage.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error("Erreur critique lors de l'appel API:", error);
+                outputArea.innerHTML = `<p class="text-red-500">Erreur critique : ${error.message}</p>`;
+                statusMessage.textContent = 'Erreur réseau.';
+                statusMessage.classList.remove('hidden');
+            } finally {
+                loader.style.display = 'none';
+                generateButton.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
 
