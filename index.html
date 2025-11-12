@@ -55,7 +55,7 @@
                 </button>
             </div>
             <div class="text-xs text-gray-500 mt-2 text-center">
-                Utilise la clé API Gemini valide
+                Clé API: <span id="apiStatus" class="font-mono">⚠️ Non configurée</span>
             </div>
         </div>
     </div>
@@ -65,10 +65,19 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const typingIndicator = document.getElementById('typingIndicator');
+        const apiStatus = document.getElementById('apiStatus');
 
-        // ⚠️ REMPLACE CECI PAR TA VRAIE CLÉ API GEMINI ⚠️
-        const API_KEY = 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE';
-        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`;
+        // ⚠️ REMPLACE UNIQUEMENT CETTE LIGNE PAR TA CLÉ API ⚠️
+        const API_KEY = 'TA_CLE_API_GEMINI';
+        
+        // URL corrigée - version stable de l'API
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`;
+
+        // Met à jour le statut de la clé API
+        if (API_KEY !== 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE') {
+            apiStatus.textContent = '✅ Configurée';
+            apiStatus.className = 'font-mono text-green-600';
+        }
 
         function addMessage(message, isUser = false, isError = false) {
             const messageDiv = document.createElement('div');
@@ -115,9 +124,17 @@
         }
 
         async function sendMessageToGemini(message) {
+            // Vérification de la clé API
+            if (API_KEY === 'TA_CLE_API_GEMINI') {
+                addMessage("❌ Clé API non configurée - Remplace 'TA_CLE_API_GEMINI' par ta vraie clé", false, true);
+                return;
+            }
+
             showTypingIndicator();
             
             try {
+                console.log('📡 Envoi vers:', API_URL);
+                
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
@@ -132,27 +149,29 @@
                     })
                 });
 
+                console.log('📨 Statut réponse:', response.status);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
                 hideTypingIndicator();
 
-                console.log('Réponse API complète:', data);
+                console.log('✅ Réponse API:', data);
 
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     const botResponse = data.candidates[0].content.parts[0].text;
                     addMessage(botResponse, false);
                 } else if (data.error) {
-                    addMessage(`❌ Erreur API: ${data.error.message}`, false, true);
+                    addMessage(`❌ Erreur: ${data.error.message}`, false, true);
                 } else {
-                    addMessage("⚠️ Format de réponse inattendu", false, true);
+                    addMessage("⚠️ Réponse inattendue de l'API", false, true);
                 }
             } catch (error) {
                 hideTypingIndicator();
-                addMessage(`🔌 Erreur: ${error.message}`, false, true);
-                console.error('Erreur détaillée:', error);
+                addMessage(`🔌 ${error.message}`, false, true);
+                console.error('❌ Erreur détaillée:', error);
             }
         }
 
@@ -182,8 +201,9 @@
 
         messageInput.focus();
 
-        // Vérification de la clé API
-        console.log('🔑 Clé API configurée:', API_KEY !== 'TA_CLE_API_GEMINI' ? 'OUI' : 'NON - À REMPLACER');
+        // Debug
+        console.log('🚀 Chat Gemini initialisé');
+        console.log('🔑 Clé API:', API_KEY !== 'TA_CLE_API_GEMINI' ? '✅ Configurée' : '❌ Non configurée');
         console.log('📡 URL API:', API_URL);
     </script>
 </body>
