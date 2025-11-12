@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Carnet d’aventure</title>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Charge d'abord Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -39,14 +39,16 @@
     </div>
 
     <!-- CHAT WINDOW -->
-    <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
-      <div class="flex items-start gap-2">
-        <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
-        <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
-          Salut, j'écoute. Envoie un message quand tu veux.
-        </div>
-      </div>
+<div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
+  <div class="flex items-start gap-2">
+    <div class="w-8 h-8 flex items-center justify-center text-xl text-gray-500">
+      <i class="fa-solid fa-robot"></i>
     </div>
+    <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
+      Salut, j'écoute. Envoie un message quand tu veux.
+    </div>
+  </div>
+</div>
 
     <!-- INPUT -->
     <div class="border-t p-4 bg-white flex items-center gap-3">
