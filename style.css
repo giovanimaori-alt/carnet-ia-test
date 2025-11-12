@@ -1,6 +1,6 @@
-/* 🌍 CARNET D’AVENTURIER – Version finale complète */
+/* 🌍 CARNET D’AVENTURIER – Version reliure + lisibilité */
 
-/* Police manuscrite */
+/* Police manuscrite uniquement pour titres et onglets */
 @import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
 
 /* --- FOND GLOBAL --- */
@@ -13,18 +13,33 @@ body {
     url('https://upload.wikimedia.org/wikipedia/commons/9/9d/Paper_texture_background.jpg');
   background-size: 18px 18px, cover;
   background-attachment: fixed;
-  font-family: 'Courier New', monospace;
+  font-family: 'Trebuchet MS', sans-serif;
   color: #2b1a00;
 }
 
 /* --- CARNET PRINCIPAL --- */
 div.w-full.max-w-md {
-  background: rgba(255, 253, 248, 0.95);
+  background: rgba(255, 253, 248, 0.96);
   border: 3px solid #b8975f;
   border-radius: 18px;
   box-shadow: 0 4px 25px rgba(80, 60, 20, 0.25);
   overflow: hidden;
   backdrop-filter: blur(1px);
+  position: relative;
+}
+
+/* --- effet reliure à gauche --- */
+div.w-full.max-w-md::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 0;
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(90,70,40,0.35), rgba(255,255,255,0));
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+  box-shadow: inset -2px 0 4px rgba(0,0,0,0.15);
 }
 
 /* --- EN-TÊTE --- */
@@ -73,7 +88,7 @@ header h1 {
   border: 1px solid #e0cda2;
   border-radius: 12px;
   box-shadow: inset 0 1px 2px rgba(150,120,80,0.1);
-  font-family: 'Shadows Into Light', cursive;
+  font-family: 'Trebuchet MS', sans-serif;
   font-size: 1rem;
   line-height: 1.4;
 }
@@ -83,7 +98,7 @@ header h1 {
   background: #8b5e3c !important;
   border: 1px solid #5c3b22;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  font-family: 'Courier New', monospace;
+  font-family: 'Trebuchet MS', sans-serif;
 }
 
 /* --- ZONE DE SAISIE --- */
@@ -120,7 +135,7 @@ footer {
   margin-top: 6px;
 }
 
-/* --- PETITS EFFETS --- */
+/* --- ANIMATIONS DOUCES --- */
 div, header, button, textarea {
   transition: all 0.3s ease;
 }
