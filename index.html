@@ -3,219 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carnet d'Explorateur</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icone.png"> 
-    
-    <link rel="stylesheet" href="style.css">
+    <title>Structure de Chat Épurée</title>
+    <!-- Chargement de Tailwind CSS pour le style -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Utilisation de la police Inter et fond neutre */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+        }
+        /* Cache la barre de défilement pour un look plus propre sur la zone d'historique */
+        .chat-history-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .chat-history-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
 </head>
-<body>
-    
-    <div id="app-container">
-        
-        <header>
-            <h1>Carnet d'Explorateur IA</h1>
-            <div id="boussole">🧭</div> 
-            
-            <button id="btn-parametres">⚙️ Paramètres (Modules)</button>
+<!-- 1. BODY : Centrage du conteneur principal -->
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- 2. CONTENEUR DE CHAT : Centré, Largeur maximale (max-w-lg), Hauteur limitée, Disposition Flex (colonne) -->
+    <div id="chat-container" class="w-full max-w-lg bg-white rounded-xl shadow-xl flex flex-col h-[90vh] sm:h-[80vh] overflow-hidden">
+
+        <!-- En-tête (Fixe en haut) -->
+        <header class="p-4 border-b border-gray-200 bg-gray-50">
+            <h1 class="text-lg font-semibold text-gray-800 text-center">
+                Conversation
+            </h1>
         </header>
 
-        <main>
-            <div id="main-content-area">
-                 <p>Bienvenue ! Veuillez cliquer sur **Paramètres** et **Fermer & Enregistrer** pour tester la connexion et commencer votre exploration.</p>
+        <!-- 3. ZONE D'HISTORIQUE : Prend l'espace restant (flex-1) et permet le défilement vertical -->
+        <main id="chat-history" class="chat-history-scroll flex-1 p-5 space-y-4 overflow-y-auto">
+
+            <!-- Message d'explication (Gemini) -->
+            <div class="flex justify-start">
+                <div class="max-w-[80%] bg-blue-50 p-3 rounded-lg rounded-tl-none text-gray-700">
+                    <p class="font-medium text-blue-700">Système</p>
+                    <p>Ceci est le corps de la discussion. Il est configuré pour avoir une hauteur maximale et utilise le défilement pour afficher les longues conversations sans agrandir le conteneur principal.</p>
+                </div>
             </div>
-            
-            <div id="dynamic-response-container" class="gemini-response" style="display:none;">
-                <p><strong>Réponse de Gemini :</strong> <span id="dynamic-response-text"></span></p>
+
+            <!-- Exemple de longue réponse pour forcer le défilement -->
+            <div class="flex justify-start">
+                <div class="max-w-[80%] bg-blue-50 p-3 rounded-lg rounded-tl-none text-gray-700">
+                    <p class="font-medium text-blue-700">Système (Long)</p>
+                    <p>Ceci est un très long message de test. Nous le répétons plusieurs fois pour nous assurer que la zone `main` fonctionne correctement en mode défilement. Contrairement à l'agrandissement d'un bloc, le défilement préserve la hauteur du conteneur de chat, ce qui est crucial pour maintenir la barre de saisie à une position fixe en bas. Le défilement est la clé de l'équilibre pour la gestion des réponses longues.</p>
+                </div>
             </div>
+
+            <!-- Message Utilisateur -->
+            <div class="flex justify-end">
+                <div class="max-w-[80%] bg-blue-600 text-white p-3 rounded-lg rounded-br-none">
+                    <p>Structure propre validée !</p>
+                </div>
+            </div>
+
+            <!-- Messages supplémentaires pour remplir l'espace et valider le scroll -->
+            <div class="flex justify-start"><div class="max-w-[80%] bg-blue-50 p-3 rounded-lg rounded-tl-none text-gray-700">Message 1</div></div>
+            <div class="flex justify-end"><div class="max-w-[80%] bg-blue-600 text-white p-3 rounded-lg rounded-br-none">Message 2</div></div>
+            <div class="flex justify-start"><div class="max-w-[80%] bg-blue-50 p-3 rounded-lg rounded-tl-none text-gray-700">Message 3</div></div>
+            <div class="flex justify-end"><div class="max-w-[80%] bg-blue-600 text-white p-3 rounded-lg rounded-br-none">Message 4</div></div>
+            <div class="flex justify-start"><div class="max-w-[80%] bg-blue-50 p-3 rounded-lg rounded-tl-none text-gray-700">Message 5</div></div>
+            <div class="flex justify-end"><div class="max-w-[80%] bg-blue-600 text-white p-3 rounded-lg rounded-br-none">Message 6</div></div>
+
         </main>
-        
-        <section id="saisie-utilisateur">
-            <hr>
-            <h2>Votre Question</h2>
-            <form id="chat-form">
-                <textarea id="user-input" rows="4" placeholder="Tapez votre question ici..."></textarea>
-                <button type="submit" id="btn-envoyer">Envoyer à Gemini</button>
-            </form>
-        </section>
 
-    </div>
-
-    <div id="modal-parametres" class="modal-cache">
-        <div class="modal-contenu">
-            <h2>⚙️ Réglages & Modules d'Exploration</h2>
-            <p>Choisissez les fonctionnalités que vous souhaitez activer pour votre session :</p>
-            
-            <div class="groupe-modules">
-                <h3>Mode de Base</h3>
-                <label>
-                    <input type="checkbox" id="module-exploration" checked>
-                    **Exploration Thématique** (Ex: Les lacs, les insectes)
-                </label>
-                <p class="description-module">Permet de lancer une étude sur un grand thème sans avoir besoin d'une photo précise.</p>
-                
-                <label>
-                    <input type="checkbox" id="module-determination">
-                    **Détermination/Identification** (Via photo ou nom)
-                </label>
-                <p class="description-module">Permet d'identifier une espèce ou un lieu précis à partir d'une photo fournie.</p>
+        <!-- 4. FOOTER (Barre de Saisie) : Fixe en bas -->
+        <footer class="p-4 border-t border-gray-200 bg-gray-50">
+            <div class="flex space-x-2">
+                <input 
+                    type="text" 
+                    placeholder="Votre message..."
+                    class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <button class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition shadow-md">
+                    Envoyer
+                </button>
             </div>
-            
-            <button id="btn-fermer-modal">Fermer & Enregistrer</button>
-        </div>
+        </footer>
+
     </div>
-    <script>
-        // --- 1. CONFIGURATION DE BASE ---
-        
-        // ** CLÉ API (Insérée) **
-        // ATTENTION : Cette clé est visible publiquement. Pour un vrai projet, utilisez un proxy serveur.
-        const GEMINI_API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE"; 
-        
-        // L'URL de l'API Gemini
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-        // DOM Elements
-        const mainContentArea = document.getElementById('main-content-area');
-        const dynamicResponseContainer = document.getElementById('dynamic-response-container');
-        const dynamicResponseText = document.getElementById('dynamic-response-text');
-        const chatForm = document.getElementById('chat-form');
-        const userInput = document.getElementById('user-input');
-        const btnEnvoyer = document.getElementById('btn-envoyer');
-        
-        // --- 2. LOGIQUE DE L'INTERFACE (Ouverture/Fermeture Modale) ---
-        
-        const btnParametres = document.getElementById('btn-parametres');
-        const modalParametres = document.getElementById('modal-parametres');
-        const btnFermerModal = document.getElementById('btn-fermer-modal');
-
-        // Écouteur pour ouvrir la modale
-        if(btnParametres) {
-            btnParametres.addEventListener('click', () => {
-                modalParametres.style.display = 'block';
-                modalParametres.classList.remove('modal-cache');
-            });
-        }
-        
-        // Écouteur pour fermer la modale et lancer le test API
-        if(btnFermerModal) {
-            btnFermerModal.addEventListener('click', () => {
-                modalParametres.style.display = 'none';
-                modalParametres.classList.add('modal-cache');
-                // Lancement du test de connexion API
-                testerConnexionGemini(); 
-            });
-        }
-
-        // --- 3. LOGIQUE D'ENVOI DE NOUVELLE QUESTION ---
-
-        if(chatForm) {
-            chatForm.addEventListener('submit', async (e) => {
-                e.preventDefault(); // Empêche le rechargement de la page
-                const question = userInput.value.trim();
-
-                if (question) {
-                    // Masque la zone de test et affiche l'indicateur
-                    mainContentArea.innerHTML = ''; 
-                    dynamicResponseContainer.style.display = 'block';
-                    dynamicResponseText.textContent = "Recherche en cours... Merci de patienter.";
-                    btnEnvoyer.disabled = true;
-
-                    // Envoi de la requête
-                    await envoyerRequeteGemini(question);
-                    
-                    // Réactive et vide l'input
-                    btnEnvoyer.disabled = false;
-                    userInput.value = '';
-                }
-            });
-        }
-
-
-        // --- 4. FONCTION PRINCIPALE D'APPEL GEMINI ---
-        
-        async function envoyerRequeteGemini(prompt) {
-            console.log(`Envoi de la requête pour : ${prompt}`);
-            
-            try {
-                const response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [{ role: "user", parts: [{ text: prompt }] }]
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                const reponseGemini = data.candidates[0].content.parts[0].text;
-                
-                // Affichage de la réponse dynamique
-                dynamicResponseText.textContent = reponseGemini;
-                
-            } catch (error) {
-                // Affichage de l'erreur
-                dynamicResponseText.innerHTML = `
-                    <span style="color: red; font-weight: bold;">❌ ERREUR API :</span> ${error.message}
-                `;
-                console.error('Erreur lors de l’appel API Gemini:', error);
-            }
-        }
-
-
-        // --- 5. FONCTION DE TEST GEMINI (Initial) ---
-        
-        function testerConnexionGemini() {
-            const testPrompt = "Donne-moi une brève anecdote scientifique sur l'érable en une phrase.";
-            
-            console.log("Tentative de connexion à Gemini...");
-            
-            fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contents: [{ role: "user", parts: [{ text: testPrompt }] }]
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const reponseGemini = data.candidates[0].content.parts[0].text;
-                
-                // Affichage du résultat dans la zone principale (test)
-                mainContentArea.innerHTML = `
-                    <h2>✅ Connexion Réussie !</h2>
-                    <p><strong>Question :</strong> ${testPrompt}</p>
-                    <p><strong>Réponse de Gemini :</strong> ${reponseGemini}</p>
-                `;
-                
-                // Masque la zone de réponse dynamique tant qu'aucune question n'est posée
-                dynamicResponseContainer.style.display = 'none';
-            })
-            .catch(error => {
-                mainContentArea.innerHTML = `
-                    <h2>❌ Échec de la Connexion API</h2>
-                    <p style="color: red;">
-                        <strong>Détails :</strong> ${error.message}. <br>
-                        Vérifiez votre clé API ou l'état du serveur.
-                    </p>
-                `;
-                console.error('Erreur lors de l’appel API Gemini:', error);
-            });
-        }
-    </script>
 </body>
 </html>
+
 
