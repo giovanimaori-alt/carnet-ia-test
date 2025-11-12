@@ -5,11 +5,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Carnet d’aventure</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- Charge d'abord Tailwind -->
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Ensuite ton fichier CSS perso -->
+  <!-- Ton CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -22,15 +22,12 @@
       <h1 class="text-xl font-semibold">🌱 CARNET D’AVENTURE</h1>
 
       <div class="flex items-center gap-4">
-        <!-- bouton paramètres (boussole) -->
         <span class="text-2xl cursor-pointer select-none">🧭</span>
-
-        <!-- bouton plein écran -->
         <span id="fullscreenBtn" class="cursor-pointer text-xl select-none">⛶</span>
       </div>
     </header>
 
-    <!-- 🔥 ONGLET : UNE SEULE RANGÉE (Carnet / Photo / Terrain / Reset) -->
+    <!-- ONGLET -->
     <div class="w-full border-b flex justify-between px-4 bg-white">
       <button class="tab-btn active flex-1 py-3 text-blue-600 border-b-4 border-blue-600">Carnet</button>
       <button class="tab-btn flex-1 py-3 text-gray-600">Photo</button>
@@ -39,19 +36,14 @@
     </div>
 
     <!-- CHAT WINDOW -->
-<div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
-
-  <!-- MESSAGE STATIQUE (robot) -->
-  <div class="flex items-start gap-2">
-    <div class="w-8 h-8 flex items-center justify-center text-xl text-gray-500">
-      <i class="fa-solid fa-robot"></i>
+    <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
+      <div class="flex items-start gap-2">
+        <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+        <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
+          Salut, j'écoute. Envoie un message quand tu veux.
+        </div>
+      </div>
     </div>
-    <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
-      Salut, j'écoute. Envoie un message quand tu veux.
-    </div>
-  </div>
-
-</div>
 
     <!-- INPUT -->
     <div class="border-t p-4 bg-white flex items-center gap-3">
@@ -71,45 +63,50 @@
 
   <!-- SCRIPT -->
   <script>
-    // ⚠️ Mode test : clé provisoire, tu la supprimeras plus tard
-    const API_KEY = "AIzaSyAOSPp84UoD5V6ZkC6OWFZTRc4PnLkiOt4";
+    const API_KEY = "AIza";
 
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
     const send = document.getElementById("send");
 
-    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function esc(s){
+      return String(s||'')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;');
+    }
 
-function appendBubble(text, who='ia', loaderId=null) {
-  const safe = String(text || '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+    /* =======================================================
+       BUBBLE (VERSION CORRIGÉE : IA = FULL WIDTH)
+    ======================================================= */
+    function appendBubble(text, who='ia', loaderId=null){
+      const safe = esc(text);
 
-  const html = who === 'user'
-    ? `<div class="flex justify-end">
-         <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">
-           ${safe}
-         </div>
-       </div>`
+      const html = who === 'user'
+        ? `<div class="flex justify-end">
+             <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">
+               ${safe}
+             </div>
+           </div>`
 
-    : `<div class="flex">
-         <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl w-full mx-2">
-           ${safe}
-         </div>
-       </div>`;
+        : `<div class="flex">
+             <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl w-full mx-2">
+               ${safe}
+             </div>
+           </div>`;
 
-  if (loaderId) {
-    const el = document.getElementById(loaderId);
-    if (el) el.outerHTML = html; 
-    else chat.innerHTML += html;
-  } else {
-    chat.innerHTML += html;
-  }
+      if(loaderId){
+        const el = document.getElementById(loaderId);
+        if(el) el.outerHTML = html;
+        else chat.innerHTML += html;
+      } else {
+        chat.innerHTML += html;
+      }
 
-  chat.scrollTop = chat.scrollHeight;
-}
+      chat.scrollTop = chat.scrollHeight;
+    }
 
+    /* GEMINI */
     async function callGeminiOfficial(prompt) {
       const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
       const payload = { contents: [ { parts: [ { text: prompt } ] } ] };
@@ -124,7 +121,6 @@ function appendBubble(text, who='ia', loaderId=null) {
       return res.json();
     }
 
-    /** extraction propre */
     function extractText(data) {
       try {
         const parts = data.candidates?.[0]?.content?.parts;
@@ -132,11 +128,12 @@ function appendBubble(text, who='ia', loaderId=null) {
           return parts.map(p => p.text).join("\n").trim();
         }
         return "(pas de texte)";
-      } catch (e) {
+      } catch {
         return "(erreur d’extraction)";
       }
     }
 
+    /* SEND */
     send.addEventListener("click", async () => {
       const text = input.value.trim();
       if (!text) return;
@@ -145,7 +142,11 @@ function appendBubble(text, who='ia', loaderId=null) {
       appendBubble(text, "user");
 
       const loaderId = "ldr-" + Date.now();
-      chat.innerHTML += `<div id="${loaderId}" class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">...</div></div>`;
+      chat.innerHTML += `
+        <div id="${loaderId}" class="flex items-start gap-2">
+          <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+          <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">...</div>
+        </div>`;
       chat.scrollTop = chat.scrollHeight;
 
       try {
@@ -157,14 +158,15 @@ function appendBubble(text, who='ia', loaderId=null) {
     });
 
     input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); }
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send.click();
+      }
     });
 
-    /* ✅ bouton Reset */
     document.getElementById("resetChat").addEventListener("click", () => {
       chat.innerHTML = "";
     });
-
   </script>
 </body>
 </html>
