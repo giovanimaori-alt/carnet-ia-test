@@ -3,304 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistant Gemini - Recherche et Gestion de Données</title>
+    <title>Carnet d'Aventurier - Interface Gemini</title>
     <!-- Chargement du CDN de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuration de la police Inter -->
+    <!-- Configuration de la police Inter et styles personnalisés -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f7f9fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        /* Style personnalisé pour les cartes */
-        .card {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        /* Style général de l'application - la "belle fenêtre" */
+        .app-container {
+            max-width: 40rem;
+            width: 95%;
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 10, 0, 0.04);
+            overflow: hidden;
         }
-        /* Animation de chargement simple */
+        /* Style pour le loader (sera utilisé plus tard) */
         .loader {
             border-top-color: #10b981;
             -webkit-animation: spinner 1s linear infinite;
             animation: spinner 1s linear infinite;
-        }
-        @-webkit-keyframes spinner {
-            to {transform: rotate(360deg);}
         }
         @keyframes spinner {
             to {transform: rotate(360deg);}
         }
     </style>
 </head>
-<body class="p-4 sm:p-6 lg:p-8 min-h-screen flex justify-center items-start">
+<body class="p-4 sm:p-6 lg:p-8">
 
-    <div class="w-full max-w-4xl">
-        <!-- En-tête de l'application -->
-        <header class="text-center mb-6">
-            <h1 class="text-4xl font-bold text-gray-800">Assistant Gemini</h1>
-            <p class="text-gray-600 mt-2">Posez vos questions et obtenez des réponses fondées et créatives.</p>
+    <!-- LE CONTENEUR UNIQUE (LA BELLE FENÊTRE) -->
+    <div class="app-container flex flex-col h-[80vh] sm:h-[90vh]">
+        
+        <!-- En-tête Intégré -->
+        <header class="text-center p-6 bg-emerald-600 text-white shadow-md">
+            <h1 class="text-3xl font-bold">Carnet d'Aventurier</h1>
+            <p class="text-sm opacity-90 mt-1">Votre guide personnel propulsé par Gemini.</p>
         </header>
 
-        <!-- Section pour afficher l'ID Utilisateur (OBLIGATOIRE pour Firebase) -->
-        <div id="userIdSection" class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded-lg mb-6 text-sm hidden">
-            <p class="font-semibold">Statut du carnet de notes : <span class="text-green-700">Prêt</span></p>
-            <p id="userIdDisplay" class="font-mono break-all text-xs mt-1"></p>
+        <!-- Zone de sortie (Conseils de l'Oracle) - HAUT et SCROLLABLE -->
+        <!-- J'ajoute un padding plus grand (p-6) et un fond légèrement gris (bg-gray-100) pour séparer visuellement -->
+        <div class="flex-grow p-6 overflow-y-auto bg-gray-100 border-b border-gray-200">
+            <div id="outputArea" class="prose max-w-none text-gray-700 leading-relaxed space-y-4">
+                <p class="text-gray-500 italic">Bienvenue, aventurier. Décrivez votre situation ci-dessous pour recevoir les conseils de l'Oracle.</p>
+            </div>
+            
+            <div id="sourcesArea" class="mt-4 pt-4 border-t border-gray-100 hidden">
+                <h3 class="text-lg font-semibold text-gray-600 mb-2">Sources :</h3>
+                <ul id="sourcesList" class="list-disc list-inside space-y-1 text-sm text-gray-500">
+                    <!-- Les sources ou références apparaîtront ici -->
+                </ul>
+            </div>
         </div>
 
-        <!-- Zone de saisie -->
-        <div class="card bg-white p-5 rounded-xl shadow-lg mb-8">
-            <textarea id="promptInput"
-                      class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-150"
-                      rows="4"
-                      placeholder="Entrez votre question ou votre requête ici..."></textarea>
 
-            <div class="mt-4 flex flex-col sm:flex-row justify-end items-center">
+        <!-- Zone de saisie (Le Carnet) - BAS (L'input de l'utilisateur) -->
+        <div class="p-4 bg-white">
+            <!-- J'ai supprimé le titre h2 pour plus de clarté -->
+            <textarea id="promptInput"
+                      class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-150 resize-none"
+                      rows="3"
+                      placeholder="J'entre dans un donjon gardé par un dragon de glace..."></textarea>
+
+            <div class="mt-2 flex flex-col sm:flex-row justify-end items-center">
                 <div id="statusMessage" class="text-sm text-red-500 mr-4 mb-2 sm:mb-0 hidden"></div>
                 <button id="generateButton"
-                        class="w-full sm:w-auto px-6 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-emerald-500 focus:ring-opacity-50 flex items-center justify-center"
-                        onclick="startGeneration()">
-                    <span id="buttonText">Générer la Réponse</span>
+                        class="w-full sm:w-auto px-6 py-2 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition duration-200 flex items-center justify-center"
+                        disabled>
+                    <span id="buttonText">Lancer l'Analyse</span>
                     <div id="loader" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6 ml-2 hidden"></div>
                 </button>
             </div>
         </div>
 
-        <!-- Zone de sortie -->
-        <div class="card bg-white p-5 rounded-xl shadow-lg">
-            <h2 class="text-2xl font-semibold text-gray-800 border-b pb-2 mb-4">Résultat</h2>
-            <div id="outputArea" class="prose max-w-none text-gray-700 leading-relaxed min-h-[100px] p-2 border border-dashed border-gray-200 rounded-lg">
-                <p class="text-gray-400">La réponse de Gemini apparaîtra ici.</p>
-            </div>
-
-            <!-- Affichage des sources -->
-            <div id="sourcesArea" class="mt-4 pt-4 border-t border-gray-100 hidden">
-                <h3 class="text-lg font-semibold text-gray-600 mb-2">Sources (Google Search) :</h3>
-                <ul id="sourcesList" class="list-disc list-inside space-y-1 text-sm text-gray-500">
-                    <!-- Les sources seront injectées ici -->
-                </ul>
-            </div>
-        </div>
     </div>
 
+    <!-- Script minimal pour l'interface (sera complété plus tard) -->
     <script type="module">
-        // ----------------------------------------------------------------------
-        // --- 1. CONFIGURATION ET INITIALISATION DE FIREBASE -------------------
-        // ----------------------------------------------------------------------
-
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Variables globales Canvas (OBLIGATOIRE)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let db;
-        let auth;
-        let userId = null;
-
-        /**
-         * Initialise Firebase, l'authentification et récupère l'ID utilisateur.
-         */
-        async function initializeFirebase() {
-            if (Object.keys(firebaseConfig).length === 0) {
-                 console.error("Configuration Firebase manquante. Le carnet de notes ne sera pas disponible.");
-                 return;
-            }
-
-            try {
-                setLogLevel('debug'); // Niveau de log pour le débogage
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Connexion (avec token personnalisé ou anonyme)
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                // Écouteur d'état d'authentification pour mettre à jour l'ID utilisateur
-                onAuthStateChanged(auth, (user) => {
-                    const userIdDisplay = document.getElementById('userIdDisplay');
-                    const userIdSection = document.getElementById('userIdSection');
-
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = `UID: ${userId}`;
-                        userIdSection.classList.remove('hidden');
-                        console.log(`Utilisateur Firebase connecté. UID: ${userId}`);
-                    } else {
-                        // Fallback si l'authentification échoue
-                        userId = crypto.randomUUID();
-                        userIdDisplay.textContent = `ID Aléatoire: ${userId}`;
-                        userIdSection.classList.remove('hidden');
-                        console.log(`Utilisateur Firebase non connecté. ID Aléatoire: ${userId}`);
-                    }
-                });
-
-            } catch (error) {
-                console.error("Erreur d'initialisation ou d'authentification Firebase:", error);
-                displayStatus("Erreur de connexion aux services de données.", 'error');
-            }
-        }
-
-        initializeFirebase();
-
-        // ----------------------------------------------------------------------
-        // --- 2. LOGIQUE GEMINI API ET UI --------------------------------------
-        // ----------------------------------------------------------------------
-
-        const apiKey = ""; // L'API Key est injectée automatiquement par l'environnement
-        const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
-        const systemInstruction = "Agis comme un expert de la recherche et de la synthèse. Fournis une réponse complète, factuelle et bien structurée, en utilisant les informations trouvées sur Google Search si nécessaire. Réponds en français.";
-
-        // Références aux éléments du DOM
-        const promptInput = document.getElementById('promptInput');
-        const generateButton = document.getElementById('generateButton');
-        const buttonText = document.getElementById('buttonText');
-        const loader = document.getElementById('loader');
-        const outputArea = document.getElementById('outputArea');
-        const sourcesArea = document.getElementById('sourcesArea');
-        const sourcesList = document.getElementById('sourcesList');
-        const statusMessage = document.getElementById('statusMessage');
-
-        /**
-         * Affiche un message d'erreur ou d'état dans l'UI.
-         * @param {string} message Le message à afficher.
-         * @param {string} type Le type de message ('error', 'info').
-         */
-        function displayStatus(message, type = 'error') {
-            statusMessage.textContent = message;
-            statusMessage.className = `text-sm mr-4 mb-2 sm:mb-0 ${type === 'error' ? 'text-red-500' : 'text-blue-500'}`;
-            statusMessage.classList.remove('hidden');
-        }
-
-        /**
-         * Fonction principale pour appeler l'API Gemini avec backoff exponentiel.
-         */
-        async function fetchWithRetry(payload, retries = 0) {
-            const maxRetries = 3;
-            try {
-                const url = `${apiUrl}?key=${apiKey}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    if (response.status === 429 && retries < maxRetries) {
-                        const delay = Math.pow(2, retries) * 1000;
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        return fetchWithRetry(payload, retries + 1);
-                    }
-                    throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
-                }
-                return await response.json();
-            } catch (error) {
-                if (retries < maxRetries) {
-                    const delay = Math.pow(2, retries) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return fetchWithRetry(payload, retries + 1);
-                }
-                throw new Error(`Échec de la connexion à l'API après ${maxRetries} tentatives.`);
-            }
-        }
-
-        /**
-         * Déclenche le processus de génération de contenu.
-         */
-        window.startGeneration = async function() {
-            const userQuery = promptInput.value.trim();
-            if (!userQuery) {
-                displayStatus("Veuillez entrer une question ou une requête.", 'error');
-                return;
-            }
-
-            // UI : Démarrer le chargement
-            statusMessage.classList.add('hidden');
-            generateButton.disabled = true;
-            buttonText.textContent = 'Génération...';
-            loader.classList.remove('hidden');
-            outputArea.innerHTML = '<p class="text-gray-500">Recherche et analyse en cours...</p>';
-            sourcesArea.classList.add('hidden');
-
-            try {
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    tools: [{ "google_search": {} }],
-                    systemInstruction: {
-                        parts: [{ text: systemInstruction }]
-                    },
-                };
-
-                const result = await fetchWithRetry(payload);
-
-                const candidate = result.candidates?.[0];
-
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    const text = candidate.content.parts[0].text;
-                    outputArea.innerHTML = formatMarkdown(text);
-
-                    // Gérer les sources
-                    let sources = [];
-                    const groundingMetadata = candidate.groundingMetadata;
-
-                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                        sources = groundingMetadata.groundingAttributions
-                            .map(attribution => ({
-                                uri: attribution.web?.uri,
-                                title: attribution.web?.title,
-                            }))
-                            .filter(source => source.uri && source.title)
-                            .slice(0, 5);
-                    }
-
-                    sourcesList.innerHTML = '';
-                    if (sources.length > 0) {
-                        sources.forEach(source => {
-                            const li = document.createElement('li');
-                            li.innerHTML = `<a href="${source.uri}" target="_blank" class="text-blue-600 hover:text-blue-800 hover:underline transition">${source.title}</a>`;
-                            sourcesList.appendChild(li);
-                        });
-                        sourcesArea.classList.remove('hidden');
-                    } else {
-                        sourcesArea.classList.add('hidden');
-                    }
-
-                } else {
-                    displayStatus("Désolé, je n'ai pas pu générer de contenu pour cette requête.", 'error');
-                    outputArea.innerHTML = '<p class="text-red-500">Erreur lors du traitement de la réponse.</p>';
-                }
-
-            } catch (error) {
-                console.error("Erreur fatale de l'application:", error);
-                displayStatus(error.message || "Une erreur inconnue est survenue lors de l'appel API.", 'error');
-                outputArea.innerHTML = `<p class="text-red-500">Échec : ${error.message || 'Vérifiez la console pour plus de détails.'}</p>`;
-            } finally {
-                // UI : Rétablir l'état du bouton
-                generateButton.disabled = false;
-                buttonText.textContent = 'Générer la Réponse';
-                loader.classList.add('hidden');
-            }
-        };
-
-        /**
-         * Fonction simplifiée pour le formatage du Markdown.
-         */
-        function formatMarkdown(markdownText) {
-            // Remplace les doubles retours à la ligne par des paragraphes
-            let html = markdownText.replace(/\n\n/g, '</p><p>');
-            // Remplace les simples retours à la ligne par des sauts de ligne (pour les listes/petites séparations)
-            html = html.replace(/\n/g, '<br>');
-            if (html.startsWith('<p>') === false) {
-                html = '<p>' + html + '</p>';
-            }
-            return html;
-        }
-
+        document.getElementById('promptInput').addEventListener('input', function() {
+            const button = document.getElementById('generateButton');
+            button.disabled = this.value.trim() === '';
+        });
+        console.log("Interface rectifiée : meilleure séparation visuelle des zones de sortie et de saisie.");
     </script>
 
 </body>
