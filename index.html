@@ -95,22 +95,17 @@
       return res.json();
     }
 
-    function extractText(data){
+    /** 🔥 version demandée pour extraire proprement le texte */
+    function extractText(data) {
       try {
-        const c = data?.candidates;
-        if (Array.isArray(c) && c.length) {
-          const cand = c[0];
-          if (cand?.content && Array.isArray(cand.content) && cand.content.length) {
-            const parts = cand.content[0]?.parts || cand.content[0]?.textParts;
-            if (Array.isArray(parts) && parts.length) return parts.map(p => p.text || p).join("").trim();
-          }
-          if (cand?.output_text) return cand.output_text;
-          if (cand?.message?.content?.[0]?.text) return cand.message.content[0].text;
+        // ✅ Gemini 2.0 Flash -> structure JSON propre
+        const parts = data.candidates?.[0]?.content?.parts;
+        if (Array.isArray(parts) && parts.length > 0) {
+          return parts.map(p => p.text).join("\n").trim();
         }
-        if (data?.output?.[0]?.content?.[0]?.text) return data.output[0].content[0].text;
-        return JSON.stringify(data).slice(0,1000);
+        return "(pas de texte)";
       } catch (e) {
-        return "(réponse non parsée)";
+        return "(erreur d’extraction)";
       }
     }
 
