@@ -1,51 +1,72 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Carnet d’aventure</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- Charge d'abord Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Ensuite ton fichier CSS perso -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
-  <!-- BARRE D’EN-TÊTE -->
-  <header class="topbar">
-    <nav>
-      <button class="tab-btn active">Carnet</button>
-      <button class="tab-btn">Photo</button>
-      <button class="tab-btn">Terrain</button>
-      <button id="resetChat" class="tab-btn">Reset</button>
-    </nav>
-  </header>
+<body class="h-screen flex flex-col justify-center items-center p-4">
 
-  <!-- CARNET PRINCIPAL -->
-  <main class="notebook">
-    <div class="spiral"></div>
-    <section class="page">
-      <!-- CHAT -->
-      <div id="chat" class="chatbox">
-        <div class="bubble-ia">Salut, j'écoute. Envoie un message quand tu veux.</div>
+  <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-4 border-blue-600">
+
+    <!-- HEADER -->
+    <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
+      <h1 class="text-xl font-semibold">🌱 CARNET D’AVENTURE</h1>
+
+      <div class="flex items-center gap-4">
+        <!-- bouton paramètres (boussole) -->
+        <span class="text-2xl cursor-pointer select-none">🧭</span>
+
+        <!-- bouton plein écran -->
+        <span id="fullscreenBtn" class="cursor-pointer text-xl select-none">⛶</span>
       </div>
+    </header>
 
-      <!-- INPUT -->
-      <div class="input-zone">
-        <textarea id="input" placeholder="Écris un message..."></textarea>
-        <button id="send">➤</button>
+    <!-- 🔥 ONGLET : UNE SEULE RANGÉE (Carnet / Photo / Terrain / Reset) -->
+    <div class="w-full border-b flex justify-between px-4 bg-white">
+      <button class="tab-btn active flex-1 py-3 text-blue-600 border-b-4 border-blue-600">Carnet</button>
+      <button class="tab-btn flex-1 py-3 text-gray-600">Photo</button>
+      <button class="tab-btn flex-1 py-3 text-gray-600">Terrain</button>
+      <button id="resetChat" class="tab-btn flex-1 py-3 text-gray-600">Reset</button>
+    </div>
+
+    <!-- CHAT WINDOW -->
+    <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
+      <div class="flex items-start gap-2">
+        <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+        <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
+          Salut, j'écoute. Envoie un message quand tu veux.
+        </div>
       </div>
-    </section>
-  </main>
+    </div>
 
-  <!-- PIED DE PAGE -->
-  <footer class="socials">
-    <a href="#" title="Facebook">🔵</a>
-    <a href="#" title="YouTube">❤️</a>
-    <a href="#" title="TikTok">🎵</a>
-    <a href="#" title="Instagram">📸</a>
+    <!-- INPUT -->
+    <div class="border-t p-4 bg-white flex items-center gap-3">
+      <textarea id="input" class="flex-1 border rounded-xl p-3 resize-none h-12 focus:ring-2 focus:ring-blue-600 outline-none"
+        placeholder="Écris un message..."></textarea>
+
+      <button id="send"
+        class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-3 rounded-xl text-sm font-semibold">
+        ➤
+      </button>
+    </div>
+  </div>
+
+  <footer class="text-xs text-gray-500 mt-2 opacity-75 select-none">
+    © Conservatoire du Canigou
   </footer>
 
-  <!-- SCRIPT GEMINI (INCHANGÉ) -->
+  <!-- SCRIPT -->
   <script>
+    // ⚠️ Mode test : clé provisoire, tu la supprimeras plus tard
     const API_KEY = "AIza";
 
     const chat = document.getElementById("chat");
@@ -57,8 +78,8 @@
     function appendBubble(text, who='ia', loaderId=null){
       const safe = esc(text);
       const html = who === 'user'
-        ? `<div class="bubble-user">${safe}</div>`
-        : `<div class="bubble-ia">${safe}</div>`;
+        ? `<div class="flex justify-end"><div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${safe}</div></div>`
+        : `<div class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">${safe}</div></div>`;
       if(loaderId){
         const el = document.getElementById(loaderId);
         if(el) el.outerHTML = html; else chat.innerHTML += html;
@@ -80,6 +101,7 @@
       return res.json();
     }
 
+    /** extraction propre */
     function extractText(data) {
       try {
         const parts = data.candidates?.[0]?.content?.parts;
@@ -96,10 +118,11 @@
       const text = input.value.trim();
       if (!text) return;
       input.value = "";
+
       appendBubble(text, "user");
 
       const loaderId = "ldr-" + Date.now();
-      chat.innerHTML += `<div id="${loaderId}" class="bubble-ia">...</div>`;
+      chat.innerHTML += `<div id="${loaderId}" class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">...</div></div>`;
       chat.scrollTop = chat.scrollHeight;
 
       try {
@@ -114,9 +137,11 @@
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); }
     });
 
+    /* ✅ bouton Reset */
     document.getElementById("resetChat").addEventListener("click", () => {
       chat.innerHTML = "";
     });
+
   </script>
 </body>
 </html>
