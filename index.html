@@ -70,9 +70,7 @@
         const API_KEY = 'AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE';
         
         // URL CORRIGÉE avec le bon modèle
-        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
-
-        const isApiKeyConfigured = API_KEY && API_KEY !== 'TA_CLE_API_GEMINI' && API_KEY.length > 20;
+        const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         function addMessage(message, isUser = false, isError = false) {
             const messageDiv = document.createElement('div');
