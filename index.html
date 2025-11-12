@@ -3,34 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat – Interface Tailwind</title>
+  <title>Chat – Carnet d’aventure</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background: #f4f6f8;
+      font-family: system-ui, sans-serif;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 h-screen flex justify-center items-center p-4">
+<body class="h-screen flex flex-col justify-center items-center p-4">
 
-  <!-- CONTAINER APP -->
-  <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden">
+  <!-- MODULE CHAT AVEC CADRE BLEU -->
+  <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-[4px] border-blue-600">
 
     <!-- HEADER -->
-    <header class="bg-emerald-600 text-white py-4 px-6 flex justify-between items-center">
+    <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
       <h1 class="text-xl font-semibold">Carnet d’aventure 1</h1>
     </header>
 
     <!-- CHAT WINDOW -->
     <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
 
-      <!-- Exemple de message de l'IA -->
+      <!-- Message modèle IA -->
       <div class="flex items-start gap-2">
         <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
         <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
-          Salut, je suis Gemini. Envoie un message quand tu veux.
+          Salut, je suis Gemini.<br>Envoie un message quand tu veux.
         </div>
       </div>
 
-      <!-- Exemple de message de l'utilisateur -->
+      <!-- Message modèle User -->
       <div class="flex justify-end">
-        <div class="bg-emerald-600 text-white px-4 py-2 rounded-xl max-w-[75%]">
+        <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">
           Ça marche.
         </div>
       </div>
@@ -39,18 +46,22 @@
 
     <!-- INPUT ZONE -->
     <div class="border-t p-4 bg-white flex items-center gap-3">
-      <textarea id="input" class="flex-1 border rounded-xl p-3 resize-none h-12 focus:ring-2 focus:ring-emerald-600 outline-none"
+      <textarea id="input" class="flex-1 border rounded-xl p-3 resize-none h-12 focus:ring-2 focus:ring-blue-600 outline-none"
         placeholder="Écris un message..."></textarea>
 
       <button id="send"
-        class="bg-emerald-600 hover:bg-emerald-700 transition text-white px-4 py-3 rounded-xl text-sm font-semibold">
+        class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-3 rounded-xl text-sm font-semibold">
         ➤
       </button>
     </div>
-
   </div>
 
-  <!-- SCRIPT (juste pour afficher le message dans le chat, pas d'API encore) -->
+  <!-- FOOTER COPYRIGHT -->
+  <div class="text-xs text-gray-500 mt-2 opacity-75 select-none">
+    © Conservatoire du Canigou
+  </div>
+
+  <!-- SCRIPT: ajoute juste le message dans le chat -->
   <script>
     const chat = document.getElementById("chat");
     const input = document.getElementById("input");
@@ -60,10 +71,10 @@
       const text = input.value.trim();
       if (!text) return;
 
-      // message utilisateur
+      // message utilisateur (bulle droite bleue)
       chat.innerHTML += `
       <div class="flex justify-end">
-        <div class="bg-emerald-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${text}</div>
+        <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${text}</div>
       </div>`;
 
       chat.scrollTop = chat.scrollHeight;
