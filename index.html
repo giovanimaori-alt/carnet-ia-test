@@ -85,8 +85,9 @@
 </div>
 
 <script>
-  const API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE";  // <-- COLLE TA CLÉ ICI
-  const MODEL = "gemini-1.5-flash";   // modèle léger et rapide
+  /* ✅ TA CLÉ EST ICI — telle que tu l’as donnée */
+  const API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE";
+  const MODEL = "gemini-1.5-flash";
 
   const input = document.getElementById("input");
   const output = document.getElementById("output");
@@ -102,8 +103,15 @@
         body: JSON.stringify({
           contents: [
             {
-              role: "user",
-              parts: [{ text: prompt }]
+              parts: [
+                { text: `
+Tu es l'Oracle du Carnet d'Aventurier.
+Réponds comme dans un jeu de rôle, avec trois actions possibles.
+
+Situation :
+${prompt}
+                ` }
+              ]
             }
           ]
         })
@@ -111,7 +119,12 @@
     );
 
     const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Réponse vide.";
+
+    const outputText =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Réponse vide.";
+
+    return outputText;
   }
 
   async function send() {
