@@ -3,30 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Carnet d’aventure</title>
-
-  <!-- TailwindCSS -->
+  <title>Carnet d’aventure – Chat Gemini</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-    body {
-      background: #f4f6f8;
-      font-family: system-ui, sans-serif;
-    }
+    body { background: #f4f6f8; font-family: system-ui, sans-serif; }
   </style>
 </head>
 
 <body class="h-screen flex flex-col justify-center items-center p-4">
 
-  <!-- MODULE CHAT -->
   <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-[4px] border-blue-600">
-
-    <!-- HEADER -->
     <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
       <h1 class="text-xl font-semibold">Carnet d’aventure</h1>
     </header>
 
-    <!-- CHAT WINDOW -->
     <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
       <div class="flex items-start gap-2">
         <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
@@ -36,7 +26,6 @@
       </div>
     </div>
 
-    <!-- INPUT -->
     <div class="border-t p-4 bg-white flex items-center gap-3">
       <textarea id="input" class="flex-1 border rounded-xl p-3 resize-none h-12 focus:ring-2 focus:ring-blue-600 outline-none"
         placeholder="Écris ton message..."></textarea>
@@ -48,68 +37,64 @@
     </div>
   </div>
 
-  <!-- COPYRIGHT -->
   <div class="text-xs text-gray-500 mt-2 opacity-75 select-none">
     © Conservatoire du Canigou
   </div>
 
-  <!-- SCRIPT GEMINI CONNECTÉ -->
-  <script type="module">
-    const API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE";
+<script type="module">
+  const API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE";
 
-    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+  import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: "models/gemini-1.5-flash-latest",
-    });
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
 
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
+  const chat = document.getElementById("chat");
+  const input = document.getElementById("input");
+  const send = document.getElementById("send");
 
-    async function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
 
-      // Bulle utilisateur
-      chat.innerHTML += `
+    chat.innerHTML += `
       <div class="flex justify-end">
         <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${text}</div>
       </div>`;
-      chat.scrollTop = chat.scrollHeight;
-      input.value = "";
+    chat.scrollTop = chat.scrollHeight;
+    input.value = "";
 
-      try {
-        const result = await model.generateContent(text);
-        const reply = result.response.text();
+    try {
+      const result = await model.generateContent(text);
+      const reply = result.response.text();
 
-        // Bulle IA
-        chat.innerHTML += `
+      chat.innerHTML += `
         <div class="flex items-start gap-2">
           <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
           <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">${reply}</div>
         </div>`;
-        chat.scrollTop = chat.scrollHeight;
+      chat.scrollTop = chat.scrollHeight;
 
-      } catch (err) {
-        chat.innerHTML += `
+    } catch (err) {
+      chat.innerHTML += `
         <div class="flex items-start">
           <div class="bg-red-500 text-white px-4 py-2 rounded-xl max-w-[75%]">
             ❌ Erreur API Gemini : ${err.message}
           </div>
         </div>`;
-      }
     }
+  }
 
-    send.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  </script>
+  send.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+</script>
 
 </body>
 </html>
