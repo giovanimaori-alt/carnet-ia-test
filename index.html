@@ -85,7 +85,8 @@
 </div>
 
 <script>
-  /* ✅ TA CLÉ EST ICI — telle que tu l’as donnée */
+  /* ✅ TA CLÉ EST ICI
+     Tu effaceras cette clé après les tests. */
   const API_KEY = "AIzaSyDOh8ROg4wDKBBt3ur2mSjp4fM8ReVS5dE";
   const MODEL = "gemini-1.5-flash";
 
@@ -95,36 +96,45 @@
   const loader = document.getElementById("loader");
 
   async function callGemini(prompt) {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: `
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `
 Tu es l'Oracle du Carnet d'Aventurier.
 Réponds comme dans un jeu de rôle, avec trois actions possibles.
 
 Situation :
 ${prompt}
-                ` }
-              ]
-            }
-          ]
-        })
+                    `
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.error) {
+        return "❌ Erreur API : " + data.error.message;
       }
-    );
 
-    const data = await res.json();
-
-    const outputText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Réponse vide.";
-
-    return outputText;
+      return (
+        data?.candidates?.[0]?.content?.parts?.[0]?.text ??
+        "Réponse vide."
+      );
+    } catch (err) {
+      return "⚠️ Erreur réseau. L'API est peut-être indisponible.";
+    }
   }
 
   async function send() {
@@ -133,17 +143,28 @@ ${prompt}
 
     loader.style.display = "inline-block";
     sendBtn.disabled = true;
+
     output.innerHTML = "<p class='text-gray-500 italic'>Analyse en cours...</p>";
 
     const answer = await callGemini(text);
 
-    output.innerHTML = answer.replace(/\n/g, "<br>");
+    output.innerHTML = answer
+      .replace(/\n/g, "<br>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
     loader.style.display = "none";
     sendBtn.disabled = false;
   }
 
+  // bouton
   sendBtn.addEventListener("click", send);
+
+  // ctrl+enter pour envoyer
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.ctrlKey) {
+      send();
+    }
+  });
 </script>
 
 </body>
