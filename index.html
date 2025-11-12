@@ -13,12 +13,29 @@
 <body class="h-screen flex flex-col justify-center items-center p-4">
 
   <!-- CHAT MODULE (version ancrée) -->
-  <div class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-4 border-blue-600">
+  <div id="module"
+       class="w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-4 border-blue-600">
 
     <!-- HEADER -->
     <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
       <h1 class="text-xl font-semibold">Carnet d’aventure</h1>
+
+      <div class="flex gap-4 items-center text-xl select-none">
+        <!-- bouton paramètres (boussole) -->
+        <button id="settings" title="Paramètres">🧭</button>
+
+        <!-- bouton plein écran -->
+        <button id="fullscreen" title="Plein écran">⛶</button>
+      </div>
     </header>
+
+    <!-- ROW DE 4 BOUTONS (juste sous le header) -->
+    <div class="bg-white border-b border-gray-200 p-3 flex justify-between gap-2">
+      <button id="btn-carnet"   class="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg py-2 text-sm font-medium">Carnet</button>
+      <button id="btn-nouveau"  class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-sm font-medium">Nouveau</button>
+      <button id="btn-photo"    class="flex-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg py-2 text-sm font-medium">Photo</button>
+      <button id="btn-terrain"  class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg py-2 text-sm font-medium">Terrain</button>
+    </div>
 
     <!-- CHAT WINDOW -->
     <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
@@ -47,15 +64,17 @@
     © Conservatoire du Canigou
   </footer>
 
-  <!-- SCRIPT : fetch officiel Gemini (JS équivalent au curl fourni) -->
+  <!-- SCRIPT : FETCH OFFICIEL GEMINI -->
   <script>
-    // ⚠️ Mode test : coller TA_CLE_ICI puis effacer après test
+    // ⚠️ Coller TA clé ici puis effacer après test
     const API_KEY = "AIzaSyAOSPp84UoD5V6ZkC6OWFZTRc4PnLkiOt4";
 
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
+    const module = document.getElementById("module");
+    const chat    = document.getElementById("chat");
+    const input   = document.getElementById("input");
+    const send    = document.getElementById("send");
 
+    // sécurise le texte affiché
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     function appendBubble(text, who='ia', loaderId=null){
@@ -63,42 +82,33 @@
       const html = who === 'user'
         ? `<div class="flex justify-end"><div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">${safe}</div></div>`
         : `<div class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">${safe}</div></div>`;
-      if(loaderId){
+      if (loaderId){
         const el = document.getElementById(loaderId);
         if(el) el.outerHTML = html; else chat.innerHTML += html;
       } else chat.innerHTML += html;
       chat.scrollTop = chat.scrollHeight;
     }
 
-    // --- FETCH officiel, équivalent exact du curl que tu as montré ---
     async function callGeminiOfficial(prompt) {
-      const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
-      const payload = {
-        contents: [
-          { parts: [ { text: prompt } ] }
-        ]
-      };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-goog-api-key": API_KEY   // <-- en-tête exactement comme le curl
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error("HTTP " + res.status + " — " + txt);
-      }
-      return res.json();
+      const res = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-goog-api-key": API_KEY
+          },
+          body: JSON.stringify({
+            contents: [ { parts: [ { text: prompt } ] } ]
+          })
+        }
+      );
+      const data = await res.json();
+      return extractText(data);
     }
 
-    /** 🔥 version demandée pour extraire proprement le texte */
     function extractText(data) {
       try {
-        // ✅ Gemini 2.0 Flash -> structure JSON propre
         const parts = data.candidates?.[0]?.content?.parts;
         if (Array.isArray(parts) && parts.length > 0) {
           return parts.map(p => p.text).join("\n").trim();
@@ -116,23 +126,30 @@
 
       appendBubble(text, "user");
 
-      const loaderId = "ldr-" + Date.now();
-      chat.innerHTML += `<div id="${loaderId}" class="flex items-start gap-2"><div class="w-8 h-8 bg-gray-300 rounded-full"></div><div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">...</div></div>`;
-      chat.scrollTop = chat.scrollHeight;
-
       try {
-        const data = await callGeminiOfficial(text);
-        const reply = extractText(data);
-        appendBubble(reply, "ia", loaderId);
+        const reply = await callGeminiOfficial(text);
+        appendBubble(reply, "ia");
       } catch (err) {
-        appendBubble("Erreur : " + (err.message || "échec"), "ia", loaderId);
-        console.error(err);
+        appendBubble("Erreur : " + (err.message || "échec"), "ia");
       }
     });
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send.click(); }
+    // === Bouton plein écran ===
+    const fullscreenBtn = document.getElementById("fullscreen");
+    fullscreenBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        module.requestFullscreen();
+        fullscreenBtn.textContent = "🗗";
+      } else {
+        document.exitFullscreen();
+        fullscreenBtn.textContent = "⛶";
+      }
     });
+
+    // === Boutons actions rapides ===
+    document.getElementById("btn-nouveau").onclick = () => chat.innerHTML = "";
+    document.getElementById("btn-carnet").onclick  = () => input.value = "Mode Carnet d’aventure :🌿 …";
+
   </script>
 </body>
 </html>
