@@ -291,8 +291,8 @@
                 const systemInstruction = getSystemInstruction();
 
                 const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=
-                ${apiKey}`;
+                // CORRECTION ICI : L'URL de l'API est construite correctement sur une seule ligne
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
                 const payload = {
                     contents: [{ parts: [{ text: userQuery }] }],
@@ -359,3 +359,5 @@
     </script>
 </body>
 </html>
+
+
