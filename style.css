@@ -210,3 +210,7 @@ div, header, button, textarea {
   z-index: 999999;
   pointer-events: none;
 }
+
+#sidePanel.open {
+  transform: translateX(0) !important;
+}
