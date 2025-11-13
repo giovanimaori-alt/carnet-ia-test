@@ -13,9 +13,10 @@ window.addEventListener("DOMContentLoaded", () => {
   const sidePanel = document.getElementById("sidePanel");
 
   const boutonPre = Array.from(document.querySelectorAll(".panel-btn"))
-  .find(btn => btn.textContent.trim() === "Préambule");
-  const preOverlay   = document.getElementById("preModalOverlay");
-  const closePre     = document.getElementById("closePreModal");
+    .find(btn => btn.textContent.trim() === "Préambule");
+  
+  const preOverlay = document.getElementById("preModalOverlay");
+  const closePre   = document.getElementById("closePreModal");
 
   console.log("script.js chargé — DOM prêt");
 
@@ -24,7 +25,6 @@ window.addEventListener("DOMContentLoaded", () => {
      ===================== */
 
   if (menuBtn && sidePanel) {
-
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       sidePanel.classList.toggle("-translate-x-full");
@@ -33,7 +33,6 @@ window.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("click", (e) => {
       const clickDansPanel = sidePanel.contains(e.target);
       const clickSurMenu   = menuBtn.contains(e.target);
-
       if (!clickDansPanel && !clickSurMenu) {
         sidePanel.classList.add("-translate-x-full");
       }
@@ -56,6 +55,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (boutonPre && preOverlay && closePre) {
 
     boutonPre.addEventListener("click", () => {
+      chargerPreambule();            // <-- CHARGE LE HTML
       preOverlay.classList.remove("hidden");
     });
 
@@ -75,7 +75,6 @@ window.addEventListener("DOMContentLoaded", () => {
   /* =====================
      BADGE VERSION
      ===================== */
-
   const version = "bêta V.0.6";
 
   if (!document.getElementById("versionBadge")) {
@@ -88,7 +87,7 @@ window.addEventListener("DOMContentLoaded", () => {
 }); // FIN DOMContentLoaded
 
 /* ===========================
-   CHARGEMENT PRÉAMBULE (HTML)
+   CHARGEMENT PRÉAMBULE
    =========================== */
 
 async function chargerPreambule() {
@@ -102,11 +101,4 @@ async function chargerPreambule() {
   } catch (err) {
     zone.innerHTML = "<p>Erreur : impossible de charger le préambule.</p>";
   }
-}
-
-// ouverture du préambule = on charge le fichier
-if (boutonPre) {
-  boutonPre.addEventListener("click", () => {
-    chargerPreambule();
-  });
 }
