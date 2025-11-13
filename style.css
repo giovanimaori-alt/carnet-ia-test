@@ -176,3 +176,40 @@ div, header, button, textarea {
 .panel-btn:hover {
   background: #e5e5e5;
 }
+
+/* === PANNEAU LATERAL — VISIBILITÉ & SLIDE === */
+
+/* Position de base : panneau caché à gauche */
+#sidePanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 78%;
+  max-width: 300px;
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+  transform: translateX(-100%);
+  transition: transform 0.30s ease;
+  z-index: 999;
+}
+
+/* Quand le panneau est ouvert */
+#sidePanel.open {
+  transform: translateX(0);
+}
+
+/* Boutons internes */
+.panel-btn {
+  width: 100%;
+  padding: 12px 14px;
+  text-align: left;
+  background: #f4f4f4;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.panel-btn:hover {
+  background: #e5e5e5;
+}
