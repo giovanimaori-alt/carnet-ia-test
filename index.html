@@ -17,7 +17,7 @@
 
 <!-- PANNEAU LATERAL -->
 <div id="sidePanel"
-     class="fixed top-0 left-0 h-full w-[80%] bg-white shadow-xl z-50 -translate-x-full transition-transform duration-300">
+     class="fixed top-0 left-0 h-full w-[80%] bg-white shadow-xl z-50 transition-transform duration-300">
   
   <!-- Contenu interne du panneau -->
   <div class="p-4 flex flex-col gap-4">
@@ -104,9 +104,6 @@
         .replace(/>/g,'&gt;');
     }
 
-    /* =======================================================
-       BUBBLE (VERSION CORRIGÉE : IA = FULL WIDTH)
-    ======================================================= */
     function appendBubble(text, who='ia', loaderId=null){
       const safe = esc(text);
 
@@ -116,7 +113,6 @@
                ${safe}
              </div>
            </div>`
-
         : `<div class="flex">
              <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl w-full mx-2">
                ${safe}
@@ -134,7 +130,6 @@
       chat.scrollTop = chat.scrollHeight;
     }
 
-    /* GEMINI */
     async function callGeminiOfficial(prompt) {
       const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
       const payload = { contents: [ { parts: [ { text: prompt } ] } ] };
@@ -161,7 +156,6 @@
       }
     }
 
-    /* SEND */
     send.addEventListener("click", async () => {
       const text = input.value.trim();
       if (!text) return;
