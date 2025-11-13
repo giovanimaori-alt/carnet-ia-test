@@ -44,3 +44,4 @@ resetBtn.addEventListener("click", () => {
    DEBUG
    ===================== */
 console.log("TEST-PANEL OK");
+alert("JS OK");
