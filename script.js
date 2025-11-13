@@ -44,4 +44,4 @@ resetBtn.addEventListener("click", () => {
    DEBUG
    ===================== */
 console.log("TEST-PANEL OK");
-alert("JS OK");
+document.querySelector("footer").textContent = "© JS chargé – panel en test";
