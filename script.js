@@ -12,6 +12,10 @@ window.addEventListener("DOMContentLoaded", () => {
   const menuBtn   = document.getElementById("menuBtn");
   const sidePanel = document.getElementById("sidePanel");
 
+  const boutonPre    = document.querySelector(".panel-btn:nth-child(6)");
+  const preOverlay   = document.getElementById("preModalOverlay");
+  const closePre     = document.getElementById("closePreModal");
+
   console.log("script.js chargé — DOM prêt");
 
   /* =====================
@@ -19,23 +23,20 @@ window.addEventListener("DOMContentLoaded", () => {
      ===================== */
 
   if (menuBtn && sidePanel) {
-    // OUVERTURE / FERMETURE sur le burger
+
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      sidePanel.classList.toggle("-translate-x-full");  // on enlève / remet la classe Tailwind
+      sidePanel.classList.toggle("-translate-x-full");
     });
 
-    // FERMETURE si clic en dehors
     document.addEventListener("click", (e) => {
       const clickDansPanel = sidePanel.contains(e.target);
       const clickSurMenu   = menuBtn.contains(e.target);
 
       if (!clickDansPanel && !clickSurMenu) {
-        sidePanel.classList.add("-translate-x-full");   // on force caché
+        sidePanel.classList.add("-translate-x-full");
       }
     });
-  } else {
-    console.log("ERREUR : menuBtn ou sidePanel introuvable");
   }
 
   /* =====================
@@ -48,8 +49,32 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================
+     MODAL PREAMBULE
+     ===================== */
+
+  if (boutonPre && preOverlay && closePre) {
+
+    boutonPre.addEventListener("click", () => {
+      preOverlay.classList.remove("hidden");
+    });
+
+    closePre.addEventListener("click", () => {
+      preOverlay.classList.add("hidden");
+    });
+
+    preOverlay.addEventListener("click", (e) => {
+      if (e.target === preOverlay) {
+        preOverlay.classList.add("hidden");
+      }
+    });
+  } else {
+    console.log("Préambule : éléments introuvables");
+  }
+
+  /* =====================
      BADGE VERSION
      ===================== */
+
   const version = "bêta V.0.2";
 
   if (!document.getElementById("versionBadge")) {
@@ -58,28 +83,5 @@ window.addEventListener("DOMContentLoaded", () => {
     badge.textContent = "JS " + version;
     document.body.appendChild(badge);
   }
-});
 
-/* ===========================
-   MODAL PREAMBULE
-=========================== */
-
-const boutonPre = document.querySelector(".panel-btn:nth-child(6)"); // bouton « Préambule »
-const preOverlay = document.getElementById("preModalOverlay");
-const closePre = document.getElementById("closePreModal");
-
-if (boutonPre && preOverlay && closePre) {
-  boutonPre.addEventListener("click", () => {
-    preOverlay.classList.remove("hidden");
-  });
-
-  closePre.addEventListener("click", () => {
-    preOverlay.classList.add("hidden");
-  });
-
-  preOverlay.addEventListener("click", (e) => {
-    if (e.target === preOverlay) {
-      preOverlay.classList.add("hidden");
-    }
-  });
-}
+}); // FIN DOMContentLoaded
