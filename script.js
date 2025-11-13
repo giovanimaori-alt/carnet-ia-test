@@ -105,7 +105,6 @@ async function chargerPreambule() {
 }
 
 // ouverture du préambule = on charge le fichier
-const boutonPre = document.querySelector(".panel-btn:nth-child(6)");
 if (boutonPre) {
   boutonPre.addEventListener("click", () => {
     chargerPreambule();
