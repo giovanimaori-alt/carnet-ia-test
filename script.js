@@ -45,3 +45,6 @@ resetBtn.addEventListener("click", () => {
 
 /* Rien ajouté ici — ta logique Gemini est dans index.html.
    Ce script reste MINIMAL, comme demandé. */
+
+console.log("TEST-PANEL");
+document.body.style.border = "5px solid red";
