@@ -36,19 +36,21 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("ERREUR : menuBtn OU sidePanel introuvable");
   }
 
-/* =====================
-   RESET CHAT
-   ===================== */
-resetBtn?.addEventListener("click", () => {
-  chat.innerHTML = "";
-});
+  /* =====================
+     RESET CHAT
+     ===================== */
+  resetBtn?.addEventListener("click", () => {
+    chat.innerHTML = "";
+  });
 
-/* ===== BADGE VERSION ===== */
-const version = "bêta V.0.1";
+  /* ===== BADGE VERSION ===== */
+  const version = "bêta V.0.1";
 
-if (!document.getElementById("versionBadge")) {
-  const badge = document.createElement("div");
-  badge.id = "versionBadge";
-  badge.textContent = "JS " + version;
-  document.body.appendChild(badge);
-}
+  if (!document.getElementById("versionBadge")) {
+    const badge = document.createElement("div");
+    badge.id = "versionBadge";
+    badge.textContent = "JS " + version;
+    document.body.appendChild(badge);
+  }
+
+}); // ← **ACCOLADE FERMANTE MANQUANTE FIXÉE**
