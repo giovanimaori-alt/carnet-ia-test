@@ -22,9 +22,26 @@ menuBtn.addEventListener("click", () => {
   sidePanel.classList.toggle("open");
 });
 
+/* FERMETURE AU TOUCH EN DEHORS DU PANNEAU (OPTIONNEL MAIS UTILE) */
+document.addEventListener("click", (e) => {
+  const isClickInsidePanel = sidePanel.contains(e.target);
+  const isClickOnMenuBtn = menuBtn.contains(e.target);
+
+  if (!isClickInsidePanel && !isClickOnMenuBtn) {
+    sidePanel.classList.remove("open");
+  }
+});
+
 /* =====================
    RESET CHAT
    ===================== */
 resetBtn.addEventListener("click", () => {
   chat.innerHTML = "";
 });
+
+/* =====================
+   ENVOI MESSAGE (Gemini)
+   ===================== */
+
+/* Rien ajouté ici — ta logique Gemini est dans index.html.
+   Ce script reste MINIMAL, comme demandé. */
