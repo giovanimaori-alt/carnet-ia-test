@@ -12,7 +12,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const menuBtn   = document.getElementById("menuBtn");
   const sidePanel = document.getElementById("sidePanel");
 
-  const boutonPre    = document.querySelector(".panel-btn:nth-child(6)");
+  const boutonPre = Array.from(document.querySelectorAll(".panel-btn"))
+  .find(btn => btn.textContent.trim() === "Préambule");
   const preOverlay   = document.getElementById("preModalOverlay");
   const closePre     = document.getElementById("closePreModal");
 
