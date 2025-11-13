@@ -5,46 +5,52 @@
 window.addEventListener("DOMContentLoaded", () => {
 
   /* --- DOM ELEMENTS --- */
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
-  const send = document.getElementById("send");
-  const resetBtn = document.getElementById("resetChat");
-  const menuBtn = document.getElementById("menuBtn");
+  const chat      = document.getElementById("chat");
+  const input     = document.getElementById("input");
+  const send      = document.getElementById("send");
+  const resetBtn  = document.getElementById("resetChat");
+  const menuBtn   = document.getElementById("menuBtn");
   const sidePanel = document.getElementById("sidePanel");
 
-  console.log("JS chargé + DOM prêt");
+  console.log("script.js chargé — DOM prêt");
 
   /* =====================
-     PANNEAU LATERAL
+     PANNEAU LATÉRAL
      ===================== */
 
   if (menuBtn && sidePanel) {
+    // OUVERTURE / FERMETURE sur le burger
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      sidePanel.classList.toggle("open");
+      sidePanel.classList.toggle("-translate-x-full");  // on enlève / remet la classe Tailwind
     });
 
+    // FERMETURE si clic en dehors
     document.addEventListener("click", (e) => {
       const clickDansPanel = sidePanel.contains(e.target);
       const clickSurMenu   = menuBtn.contains(e.target);
 
       if (!clickDansPanel && !clickSurMenu) {
-        sidePanel.classList.remove("open");
+        sidePanel.classList.add("-translate-x-full");   // on force caché
       }
     });
   } else {
-    console.log("ERREUR : menuBtn OU sidePanel introuvable");
+    console.log("ERREUR : menuBtn ou sidePanel introuvable");
   }
 
   /* =====================
      RESET CHAT
      ===================== */
-  resetBtn?.addEventListener("click", () => {
-    chat.innerHTML = "";
-  });
+  if (resetBtn && chat) {
+    resetBtn.addEventListener("click", () => {
+      chat.innerHTML = "";
+    });
+  }
 
-  /* ===== BADGE VERSION ===== */
-  const version = "bêta V.0.1";
+  /* =====================
+     BADGE VERSION
+     ===================== */
+  const version = "bêta V.0.2";
 
   if (!document.getElementById("versionBadge")) {
     const badge = document.createElement("div");
@@ -52,5 +58,4 @@ window.addEventListener("DOMContentLoaded", () => {
     badge.textContent = "JS " + version;
     document.body.appendChild(badge);
   }
-
-}); // ← **ACCOLADE FERMANTE MANQUANTE FIXÉE**
+});
