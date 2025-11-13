@@ -157,3 +157,22 @@ div, header, button, textarea {
 
 #menuBtn:active { opacity: 0.6; 
 }
+
+/* Panneau latéral */
+#sidePanel {
+  background: white;
+}
+
+/* Boutons du panneau */
+.panel-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #f4f4f4;
+  font-size: 15px;
+}
+
+.panel-btn:hover {
+  background: #e5e5e5;
+}

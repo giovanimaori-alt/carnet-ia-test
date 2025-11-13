@@ -18,3 +18,13 @@ console.log("script.js chargé");
 document.getElementById("menuBtn").addEventListener("click", () => {
   alert("Menu en préparation");
 });
+
+/* =====================
+   PANNEAU LATERAL
+   ===================== */
+
+/* OUVERTURE / FERMETURE PANEL */
+menuBtn.addEventListener("click", () => {
+  const panel = document.getElementById("sidePanel");
+  panel.classList.toggle("-translate-x-full");
+});
