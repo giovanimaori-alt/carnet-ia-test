@@ -36,28 +36,19 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("ERREUR : menuBtn OU sidePanel introuvable");
   }
 
-  /* =====================
-     RESET CHAT
-     ===================== */
-  resetBtn?.addEventListener("click", () => {
-    chat.innerHTML = "";
-  });
-
-  /* =====================
-     DEBUG
-     ===================== */
-  document.body.insertAdjacentHTML(
-    "beforeend",
-    `<div style="
-      position:fixed;
-      bottom:5px;
-      left:5px;
-      background:#000;
-      color:#fff;
-      padding:4px 8px;
-      font-size:10px;
-      z-index:9999;">
-      JS OK (DOM READY)
-    </div>`
-  );
+/* =====================
+   RESET CHAT
+   ===================== */
+resetBtn?.addEventListener("click", () => {
+  chat.innerHTML = "";
 });
+
+/* ===== BADGE VERSION ===== */
+const version = "bêta V.0.1";
+
+if (!document.getElementById("versionBadge")) {
+  const badge = document.createElement("div");
+  badge.id = "versionBadge";
+  badge.textContent = "JS " + version;
+  document.body.appendChild(badge);
+}
