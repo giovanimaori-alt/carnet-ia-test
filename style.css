@@ -151,3 +151,9 @@ div, header, button, textarea {
 #tabs button:last-child {
   border-right: none;
 }
+
+#menuBtn { padding: 4px 8px; font-size: 26px; 
+}
+
+#menuBtn:active { opacity: 0.6; 
+}
