@@ -18,16 +18,17 @@ console.log("script.js chargé");
    ===================== */
 
 /* OUVERTURE / FERMETURE PANEL */
-menuBtn.addEventListener("click", () => {
+menuBtn.addEventListener("click", (e) => {
+  e.stopPropagation();               // IMPORTANT
   sidePanel.classList.toggle("open");
 });
 
-/* FERMETURE AU TOUCH EN DEHORS DU PANNEAU (OPTIONNEL MAIS UTILE) */
+/* FERMETURE AU TOUCH EN DEHORS DU PANNEAU */
 document.addEventListener("click", (e) => {
-  const isClickInsidePanel = sidePanel.contains(e.target);
-  const isClickOnMenuBtn = menuBtn.contains(e.target);
+  const clickDansPanel = sidePanel.contains(e.target);
+  const clickSurMenu   = menuBtn.contains(e.target);
 
-  if (!isClickInsidePanel && !isClickOnMenuBtn) {
+  if (!clickDansPanel && !clickSurMenu) {
     sidePanel.classList.remove("open");
   }
 });
@@ -40,11 +41,6 @@ resetBtn.addEventListener("click", () => {
 });
 
 /* =====================
-   ENVOI MESSAGE (Gemini)
+   DEBUG
    ===================== */
-
-/* Rien ajouté ici — ta logique Gemini est dans index.html.
-   Ce script reste MINIMAL, comme demandé. */
-
-console.log("TEST-PANEL");
-document.body.style.border = "5px solid red";
+console.log("TEST-PANEL OK");
