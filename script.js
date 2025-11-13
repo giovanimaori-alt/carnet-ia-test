@@ -14,11 +14,6 @@ console.log("script.js chargé");
 
 // À compléter plus tard, bloc par bloc, uniquement sur demande.
 
-/* MENU */
-document.getElementById("menuBtn").addEventListener("click", () => {
-  alert("Menu en préparation");
-});
-
 /* =====================
    PANNEAU LATERAL
    ===================== */
@@ -26,5 +21,12 @@ document.getElementById("menuBtn").addEventListener("click", () => {
 /* OUVERTURE / FERMETURE PANEL */
 menuBtn.addEventListener("click", () => {
   const panel = document.getElementById("sidePanel");
-  panel.classList.toggle("-translate-x-full");
+
+  if (panel.classList.contains("-translate-x-full")) {
+    panel.classList.remove("-translate-x-full");
+    panel.classList.add("translate-x-0");
+  } else {
+    panel.classList.remove("translate-x-0");
+    panel.classList.add("-translate-x-full");
+  }
 });
