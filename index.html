@@ -82,25 +82,27 @@
     </div>
   </div>
 
-<!-- ===========================
+<!-- ================================
      MODAL PREAMBULE
-=========================== -->
+================================= -->
 <div id="preModalOverlay"
-     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-[2000]">
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center hidden z-50">
 
   <div id="preModal"
-       class="bg-white w-[90%] max-w-xl max-h-[80%] rounded-2xl shadow-2xl p-6 overflow-y-auto relative">
+       class="bg-white w-[90%] max-w-xl max-h-[80vh] p-6 rounded-2xl shadow-xl relative overflow-y-auto">
 
     <!-- Bouton fermer -->
     <button id="closePreModal"
-            class="absolute top-3 right-3 text-2xl text-gray-600 hover:text-black">
+            class="absolute top-3 right-3 text-3xl font-bold text-gray-500 hover:text-black">
       ×
     </button>
 
     <!-- CONTENU DU PRÉAMBULE, chargé dynamiquement -->
-<div id="preContent"></div>
-</div>
-</div>
+    <div id="preContent"></div>
+
+  </div> <!-- FIN preModal -->
+
+</div> <!-- FIN overlay -->
 
   <!-- FOOTER -->
   <footer class="text-xs text-gray-500 mt-2 opacity-75 select-none">
