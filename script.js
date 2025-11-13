@@ -59,3 +59,27 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(badge);
   }
 });
+
+/* ===========================
+   MODAL PREAMBULE
+=========================== */
+
+const boutonPre = document.querySelector(".panel-btn:nth-child(6)"); // bouton « Préambule »
+const preOverlay = document.getElementById("preModalOverlay");
+const closePre = document.getElementById("closePreModal");
+
+if (boutonPre && preOverlay && closePre) {
+  boutonPre.addEventListener("click", () => {
+    preOverlay.classList.remove("hidden");
+  });
+
+  closePre.addEventListener("click", () => {
+    preOverlay.classList.add("hidden");
+  });
+
+  preOverlay.addEventListener("click", (e) => {
+    if (e.target === preOverlay) {
+      preOverlay.classList.add("hidden");
+    }
+  });
+}
