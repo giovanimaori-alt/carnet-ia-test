@@ -86,3 +86,28 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
 }); // FIN DOMContentLoaded
+
+/* ===========================
+   CHARGEMENT PRÉAMBULE (HTML)
+   =========================== */
+
+async function chargerPreambule() {
+  const zone = document.getElementById("preContent");
+  if (!zone) return;
+
+  try {
+    const res = await fetch("doc/preambule.html");
+    const html = await res.text();
+    zone.innerHTML = html;
+  } catch (err) {
+    zone.innerHTML = "<p>Erreur : impossible de charger le préambule.</p>";
+  }
+}
+
+// ouverture du préambule = on charge le fichier
+const boutonPre = document.querySelector(".panel-btn:nth-child(6)");
+if (boutonPre) {
+  boutonPre.addEventListener("click", () => {
+    chargerPreambule();
+  });
+}
