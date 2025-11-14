@@ -1,32 +1,70 @@
-/* SCRIPT Gemini */
+/* SCRIPT Gemini — Markdown complet + safe + style carnet */
 
 const API_KEY = "AIzaSyAOSPp84UoD5V6ZkC6OWFZTRc4PnLkiOt4";
 
-const chat = document.getElementById("chat");
+const chat  = document.getElementById("chat");
 const input = document.getElementById("input");
-const send = document.getElementById("send");
+const send  = document.getElementById("send");
 
-function esc(s) {
-  return String(s || "")
+/* ---------------------------------------------------------
+   SANITIZE + RENDER MARKDOWN → HTML
+--------------------------------------------------------- */
+function renderMarkdown(text) {
+
+  // 1. Neutralise le HTML
+  let safe = String(text || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+
+  // 2. Titres (ordre décroissant)
+  safe = safe.replace(/^### (.*)$/gm, "<h3 class='font-semibold text-lg my-2'>$1</h3>");
+  safe = safe.replace(/^## (.*)$/gm, "<h2 class='font-semibold text-xl my-3'>$1</h2>");
+  safe = safe.replace(/^# (.*)$/gm, "<h1 class='font-bold text-2xl my-4'>$1</h1>");
+
+  // 3. Citations
+  safe = safe.replace(/^> (.*)$/gm,
+    "<div class='border-l-4 border-amber-600 pl-3 italic text-gray-700 my-2'>$1</div>"
+  );
+
+  // 4. Listes
+  safe = safe.replace(/^[-*] (.*)$/gm,
+    "<li class='ml-4 list-disc'>$1</li>"
+  );
+
+  // entoure les <li> d’un <ul> (détection simple)
+  safe = safe.replace(/(<li[\s\S]*?<\/li>)/gm,
+    "<ul class='my-2'>$1</ul>"
+  );
+
+  // 5. Gras
+  safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // 6. Italique
+  safe = safe.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+  // 7. Sauts de ligne
+  safe = safe.replace(/\n/g, "<br>");
+
+  return safe;
 }
 
-/* BUBBLE (IA = full width) */
+/* ---------------------------------------------------------
+   AFFICHAGE DES BULLES
+--------------------------------------------------------- */
 function appendBubble(text, who = "ia", loaderId = null) {
-  const safe = esc(text);
+  const htmlText = renderMarkdown(text);
 
   const html =
     who === "user"
       ? `<div class="flex justify-end">
-           <div class="bg-blue-600 text-white px-4 py-2 rounded-xl max-w-[75%]">
-             ${safe}
+           <div class="px-4 py-2 rounded-xl max-w-[75%] text-white bg-blue-600">
+             ${htmlText}
            </div>
          </div>`
       : `<div class="flex">
-           <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl w-full mx-2">
-             ${safe}
+           <div class="px-4 py-2 rounded-xl w-full mx-2 bg-gray-200 text-gray-800">
+             ${htmlText}
            </div>
          </div>`;
 
@@ -41,7 +79,9 @@ function appendBubble(text, who = "ia", loaderId = null) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* GEMINI */
+/* ---------------------------------------------------------
+   GEMINI API
+--------------------------------------------------------- */
 async function callGeminiOfficial(prompt) {
   const url =
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
@@ -64,9 +104,7 @@ async function callGeminiOfficial(prompt) {
   });
 
   if (!res.ok)
-    throw new Error(
-      "HTTP " + res.status + " — " + (await res.text())
-    );
+    throw new Error("HTTP " + res.status + " — " + (await res.text()));
 
   return res.json();
 }
@@ -83,7 +121,9 @@ function extractText(data) {
   }
 }
 
-/* SEND */
+/* ---------------------------------------------------------
+   ENVOI MESSAGE
+--------------------------------------------------------- */
 send.addEventListener("click", async () => {
   const text = input.value.trim();
   if (!text) return;
@@ -94,7 +134,7 @@ send.addEventListener("click", async () => {
   const loaderId = "ldr-" + Date.now();
   chat.innerHTML += `
     <div id="${loaderId}" class="flex items-start gap-2">
-      <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+      <div class="w-8 h-8 rounded-full" style="background:#d8cfc2;"></div>
       <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">...</div>
     </div>`;
   chat.scrollTop = chat.scrollHeight;
@@ -107,6 +147,7 @@ send.addEventListener("click", async () => {
   }
 });
 
+/* Entrée = envoyer */
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -114,6 +155,7 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
+/* RESET */
 document.getElementById("resetChat").addEventListener("click", () => {
   chat.innerHTML = "";
 });
