@@ -252,7 +252,7 @@ div, header, button, textarea {
 }
 
 body {
-  background-image: url('images/cuir.png');
+  background-image: url('images/cuir');
   background-size: cover;
   background-repeat: repeat;
   background-position: center;
