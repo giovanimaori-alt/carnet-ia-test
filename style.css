@@ -258,3 +258,16 @@ body {
   background-position: center;
   background-attachment: fixed;
 }
+
+/* Couture fine tout autour du carnet */
+.app-root::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 6px;
+  right: 6px;
+  border-radius: 22px;
+  border: 2px dashed rgba(110, 60, 20, 0.9);
+  pointer-events: none;
+}
