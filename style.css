@@ -251,24 +251,30 @@ div, header, button, textarea {
   background: #f4f4e8 !important;
 }
 
-/* === CADRE CUIR TOUT AUTOUR DU CARNET === */
+/* ============================
+   CADRE CUIR AUTOUR DU CARNET
+============================ */
+
 .app-root {
   position: relative;
-  border: none !important;        /* On supprime la bordure beige */
+  background: #fffdf8;                  /* int. du carnet = papier */
+  border-radius: 22px;
+  overflow: hidden;
 }
 
+/* Cuir autour */
 .app-root::before {
   content: "";
   position: absolute;
-  top: 0; bottom: 0; left: 0; right: 0;
-
-  border-radius: 22px;           /* même arrondi que ton carnet */
-  padding: 8px;                  /* épaisseur du cadre */
+  top: -18px;
+  bottom: -18px;
+  left: -18px;
+  right: -18px;
 
   background-image: url("images/cuir.png");
-  background-size: cover;        /* la texture se place proprement */
+  background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
 
-  z-index: -1;                   /* reste derrière le carnet */
+  border-radius: 28px;   /* légèrement plus grand pour border extérieure */
+  z-index: -1;           /* derrière le carnet */
 }
