@@ -136,17 +136,11 @@ header h1 {
 
 /* --- PIED DE PAGE --- */
 footer {
-  color: #6b5b42;
-  font-family: 'Trebuchet MS', sans-serif;
-  text-shadow: none;
-  font-size: 0.75rem;
-  opacity: 0.8;
-
-  /* AJOUT → espace au-dessus */
-  margin-top: 18px;
-
-  /* AJOUT → pousse le texte plus bas dans la page */
-  padding-bottom: 10px;
+  position: fixed;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 
 /* --- ANIMATIONS GLOBALES --- */
