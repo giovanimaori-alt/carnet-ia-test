@@ -1,255 +1,106 @@
-/* 🌍 CARNET D’AVENTURIER – Version reliure + lisibilité */
+/* ================================
+   CARNET D'AVENTURE — SCRIPT BASE
+   ================================ */
 
-/* Imports AVANT tout le reste */
-@import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand+SC&display=swap');
+window.addEventListener("DOMContentLoaded", () => {
 
-/* --- FOND GLOBAL --- */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #f4f1e3;
-  background-image:
-    radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
-    url('https://upload.wikimedia.org/wikipedia/commons/9/9d/Paper_texture_background.jpg');
-  background-size: 18px 18px, cover;
-  background-attachment: fixed;
-  font-family: 'Trebuchet MS', sans-serif;
-  color: #2b1a00;
-}
+  /* --- DOM ELEMENTS --- */
+  const chat      = document.getElementById("chat");
+  const input     = document.getElementById("input");
+  const send      = document.getElementById("send");
+  const resetBtn  = document.getElementById("resetChat");
+  const menuBtn   = document.getElementById("menuBtn");
+  const sidePanel = document.getElementById("sidePanel");
 
-/* --- CARNET PRINCIPAL --- */
-div.w-full.max-w-md {
-  background: rgba(255, 253, 248, 0.96);
-  border: 3px solid #b8975f;
-  border-radius: 18px;
-  box-shadow: 0 4px 25px rgba(80, 60, 20, 0.25);
-  overflow: hidden;
-  backdrop-filter: blur(1px);
-  position: relative;
-}
+  const boutonPre = Array.from(document.querySelectorAll(".panel-btn"))
+    .find(btn => btn.textContent.trim() === "Préambule");
+  
+  const preOverlay = document.getElementById("preModalOverlay");
+  const closePre   = document.getElementById("closePreModal");
 
-/* --- effet reliure à gauche --- */
-div.w-full.max-w-md::before {
-  content: "";
-  position: absolute;
-  left: -12px;
-  top: 0;
-  width: 12px;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(90,70,40,0.35), rgba(255,255,255,0));
-  border-top-left-radius: 18px;
-  border-bottom-left-radius: 18px;
-  box-shadow: inset -2px 0 4px rgba(0,0,0,0.15);
-}
+  console.log("script.js chargé — DOM prêt");
 
-/* --- EN-TÊTE --- */
-header {
-  background: linear-gradient(135deg, #c1a66e, #9b7a4d);
-  color: #2b1a00 !important;
-  border-bottom: 2px solid #7b5d2f;
-  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
-}
+  /* =====================
+     PANNEAU LATÉRAL
+     ===================== */
 
-header h1 {
-  font-family: 'Patrick Hand SC', sans-serif;
-  font-size: 1.7rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
+  if (menuBtn && sidePanel) {
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sidePanel.classList.toggle("-translate-x-full");
+    });
 
-/* --- ONGLET BARRE --- */
-.tab-btn {
-  background: #f2e4c6;
-  border: 2px solid #c1a66e;
-  border-bottom: none;
-  font-weight: 600;
-  font-family: 'Shadows Into Light', cursive;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.3);
-  transition: 0.25s;
-}
+    document.addEventListener("click", (e) => {
+      const clickDansPanel = sidePanel.contains(e.target);
+      const clickSurMenu   = menuBtn.contains(e.target);
+      if (!clickDansPanel && !clickSurMenu) {
+        sidePanel.classList.add("-translate-x-full");
+      }
+    });
+  }
 
-.tab-btn:hover {
-  background: #e3d4b3;
-}
+  /* =====================
+     RESET CHAT
+     ===================== */
+  if (resetBtn && chat) {
+    resetBtn.addEventListener("click", () => {
+      chat.innerHTML = "";
+    });
+  }
 
-.tab-btn.active {
-  background: #d4b97c;
-  color: #2b1a00;
-  border-top: 3px solid #7b5d2f;
-}
+  /* =====================
+     MODAL PREAMBULE
+     ===================== */
 
-/* --- CHAT --- */
-#chat {
-  background: rgba(255, 253, 248, 0.9);
-  padding: 1rem;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(200,180,120,0.1) 28px);
-}
+  if (boutonPre && preOverlay && closePre) {
 
-/* bulles IA */
-#chat .bg-gray-200 {
-  background: #f7f2e7 !important;
-  border: 1px solid #e0cda2;
-  border-radius: 12px;
-  box-shadow: inset 0 1px 2px rgba(150,120,80,0.1);
-  font-family: 'Trebuchet MS', sans-serif;
-  font-size: 1rem;
-  line-height: 1.4;
-}
+    boutonPre.addEventListener("click", () => {
+      chargerPreambule();            // <-- CHARGE LE HTML
+      preOverlay.classList.remove("hidden");
+    });
 
-/* bulles utilisateur */
-#chat .bg-blue-600 {
-  background: #8b5e3c !important;
-  border: 1px solid #5c3b22;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  font-family: 'Trebuchet MS', sans-serif;
-}
+    closePre.addEventListener("click", () => {
+      preOverlay.classList.add("hidden");
+    });
 
-/* --- ZONE DE SAISIE --- */
-#input {
-  background: #fffdf8;
-  border: 2px solid #c1a66e;
-  border-radius: 12px;
-  color: #2b1a00;
-  font-family: 'Courier New', monospace;
-}
+    preOverlay.addEventListener("click", (e) => {
+      if (e.target === preOverlay) {
+        preOverlay.classList.add("hidden");
+      }
+    });
+  } else {
+    console.log("Préambule : éléments introuvables");
+  }
 
-#input::placeholder {
-  color: #b29a73;
-}
+  /* =====================
+     BADGE VERSION
+     ===================== */
+  const version = "bêta V.0.6";
 
-/* --- BOUTON ENVOI --- */
-#send {
-  background: linear-gradient(135deg, #c1a66e, #b0894f) !important;
-  color: #2b1a00 !important;
-  border: 2px solid #7b5d2f;
-  border-radius: 12px;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(80, 60, 20, 0.25);
-  transition: 0.2s;
-}
+  if (!document.getElementById("versionBadge")) {
+    const badge = document.createElement("div");
+    badge.id = "versionBadge";
+    badge.textContent = "JS " + version;
+    document.body.appendChild(badge);
+  }
 
-#send:hover {
-  background: #d4b97c !important;
-}
+}); // FIN DOMContentLoaded
 
-/* --- PIED DE PAGE --- */
-footer {
-  color: #6b5b42;
-  font-family: 'Trebuchet MS', sans-serif;
-  text-shadow: none;
-  font-size: 0.75rem;
-  opacity: 0.8;
-  margin-top: 6px;
-}
 
-/* --- ANIMATIONS GLOBALES --- */
-div, header, button, textarea {
-  transition: all 0.3s ease;
-}
-
-/* Séparation légère des onglets */
-#tabs button {
-  border-right: 1px solid #d2c9b8;
-}
-
-#tabs button:last-child {
-  border-right: none;
-}
-
-/* Menu bouton */
-#menuBtn {
-  padding: 4px 8px;
-  font-size: 26px;
-}
-
-#menuBtn:active {
-  opacity: 0.6;
-}
-
-/* =======================
-   🌿 PANNEAU LATÉRAL
-   ======================= */
-
-/* Ici, on laisse Tailwind gérer la translation avec -translate-x-full.
-   On ne remet PAS de transform, juste le style visuel. */
-#sidePanel {
-  background: white;
-  box-shadow: 4px 0 12px rgba(0,0,0,0.25);
-  z-index: 999;
-}
-
-/* Boutons du panneau */
-.panel-btn {
-  width: 100%;
-  text-align: left;
-  padding: 10px 14px;
-  border-radius: 6px;
-  background: #f4f4f4;
-  font-size: 15px;
-}
-
-.panel-btn:hover {
-  background: #e5e5e5;
-}
-
-/* ===== BADGE VERSION ===== */
-#versionBadge {
-  position: fixed;
-  bottom: 6px;
-  right: 8px;
-
-  font-size: 10px;
-  padding: 2px 6px;
-
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff;
-
-  border-radius: 4px;
-  z-index: 999999;
-  pointer-events: none;
-}
-
-#sidePanel.open {
-  transform: translateX(0) !important;
-}
 
 /* ===========================
-   MODAL PREAMBULE
-=========================== */
+   CHARGEMENT PRÉAMBULE
+   =========================== */
 
-#preModalOverlay.hidden {
-  display: none;
+async function chargerPreambule() {
+  const zone = document.getElementById("preContent");
+  if (!zone) return;
+
+  try {
+    const res = await fetch("doc/preambule.html");
+    const html = await res.text();
+    zone.innerHTML = html;
+  } catch (err) {
+    zone.innerHTML = "<p>Erreur : impossible de charger le préambule.</p>";
+  }
 }
-
-#preModalOverlay {
-  display: flex;
-  animation: fadeIn 0.25s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-#preModal {
-  animation: popIn 0.25s ease;
-}
-
-@keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
-}
-
-.fullscreen-active {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 9999 !important;
-  background: #f4f4e8 !important;
-}
-
-
-
