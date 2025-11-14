@@ -250,3 +250,11 @@ div, header, button, textarea {
   z-index: 9999 !important;
   background: #f4f4e8 !important;
 }
+
+body {
+  background-image: url('images/cuir.png');
+  background-size: cover;
+  background-repeat: repeat;
+  background-position: center;
+  background-attachment: fixed;
+}
