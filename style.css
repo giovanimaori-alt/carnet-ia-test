@@ -1,6 +1,6 @@
-/* 🌍 CARNET D’AVENTURIER – Version cuir + couture propre */
+/* 🌍 CARNET D’AVENTURIER – Version reliure + lisibilité */
 
-/* Imports */
+/* Imports AVANT tout le reste */
 @import url('https://fonts.googleapis.com/css2?family=Shadows+Into+Light&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand+SC&display=swap');
 
@@ -18,60 +18,36 @@ body {
   color: #2b1a00;
 }
 
-/* ==========================================
-   🎯 CARNET PRINCIPAL (TON APP-ROOT)
-   ========================================== */
-
-.app-root {
-  position: relative;
-  background: #fffdf8;
-  border-radius: 22px;
+/* --- CARNET PRINCIPAL --- */
+div.w-full.max-w-md {
+  background: rgba(255, 253, 248, 0.96);
+  border: 3px solid #b8975f;
+  border-radius: 18px;
+  box-shadow: 0 4px 25px rgba(80, 60, 20, 0.25);
   overflow: hidden;
-  z-index: 1;
+  backdrop-filter: blur(1px);
+  position: relative;
 }
 
-/* ---- CADRE CUIR AUTOUR DU CARNET ---- */
-.app-root::before {
+/* --- effet reliure à gauche --- */
+div.w-full.max-w-md::before {
   content: "";
   position: absolute;
-  top: -26px;
-  bottom: -26px;
-  left: -26px;
-  right: -26px;
-
-  background-image: url("images/cuir.png");
-  background-size: cover;
-  background-position: center;
-
-  border-radius: 32px;
-  z-index: -2; /* derrière tout */
+  left: -12px;
+  top: 0;
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(90,70,40,0.35), rgba(255,255,255,0));
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+  box-shadow: inset -2px 0 4px rgba(0,0,0,0.15);
 }
 
-/* ---- COUTURE CSS TOUT AUTOUR ---- */
-.app-root::after {
-  content: "";
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: -4px;
-  right: -4px;
-
-  border-radius: 26px;
-
-  border: 2px dashed rgba(255,255,255,0.85);
-  opacity: 0.85;
-
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* ==========================================
-   HEADER (le cuir reste tel quel)
-   ========================================== */
-
+/* --- EN-TÊTE --- */
 header {
+  background: linear-gradient(135deg, #c1a66e, #9b7a4d);
   color: #2b1a00 !important;
-  border-bottom: 2px solid rgba(0,0,0,0.2);
+  border-bottom: 2px solid #7b5d2f;
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
 }
 
@@ -82,10 +58,7 @@ header h1 {
   text-transform: uppercase;
 }
 
-/* ==========================================
-   ONGLET BARRE
-   ========================================== */
-
+/* --- ONGLET BARRE --- */
 .tab-btn {
   background: #f2e4c6;
   border: 2px solid #c1a66e;
@@ -106,10 +79,7 @@ header h1 {
   border-top: 3px solid #7b5d2f;
 }
 
-/* ==========================================
-   CHAT
-   ========================================== */
-
+/* --- CHAT --- */
 #chat {
   background: rgba(255, 253, 248, 0.9);
   padding: 1rem;
@@ -117,25 +87,26 @@ header h1 {
     repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(200,180,120,0.1) 28px);
 }
 
+/* bulles IA */
 #chat .bg-gray-200 {
   background: #f7f2e7 !important;
   border: 1px solid #e0cda2;
   border-radius: 12px;
   box-shadow: inset 0 1px 2px rgba(150,120,80,0.1);
+  font-family: 'Trebuchet MS', sans-serif;
   font-size: 1rem;
   line-height: 1.4;
 }
 
+/* bulles utilisateur */
 #chat .bg-blue-600 {
   background: #8b5e3c !important;
   border: 1px solid #5c3b22;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  font-family: 'Trebuchet MS', sans-serif;
 }
 
-/* ==========================================
-   INPUT
-   ========================================== */
-
+/* --- ZONE DE SAISIE --- */
 #input {
   background: #fffdf8;
   border: 2px solid #c1a66e;
@@ -148,6 +119,7 @@ header h1 {
   color: #b29a73;
 }
 
+/* --- BOUTON ENVOI --- */
 #send {
   background: linear-gradient(135deg, #c1a66e, #b0894f) !important;
   color: #2b1a00 !important;
@@ -162,50 +134,85 @@ header h1 {
   background: #d4b97c !important;
 }
 
-/* ==========================================
-   PANNEAU LATÉRAL
-   ========================================== */
+/* --- PIED DE PAGE --- */
+footer {
+  color: #6b5b42;
+  font-family: 'Trebuchet MS', sans-serif;
+  text-shadow: none;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 6px;
+}
 
+/* --- ANIMATIONS GLOBALES --- */
+div, header, button, textarea {
+  transition: all 0.3s ease;
+}
+
+/* Séparation légère des onglets */
+#tabs button {
+  border-right: 1px solid #d2c9b8;
+}
+
+#tabs button:last-child {
+  border-right: none;
+}
+
+/* Menu bouton */
+#menuBtn {
+  padding: 4px 8px;
+  font-size: 26px;
+}
+
+#menuBtn:active {
+  opacity: 0.6;
+}
+
+/* =======================
+   🌿 PANNEAU LATÉRAL
+   ======================= */
+
+/* Ici, on laisse Tailwind gérer la translation avec -translate-x-full.
+   On ne remet PAS de transform, juste le style visuel. */
 #sidePanel {
   background: white;
   box-shadow: 4px 0 12px rgba(0,0,0,0.25);
+  z-index: 999;
 }
 
+/* Boutons du panneau */
 .panel-btn {
   width: 100%;
   text-align: left;
   padding: 10px 14px;
   border-radius: 6px;
   background: #f4f4f4;
+  font-size: 15px;
 }
 
 .panel-btn:hover {
   background: #e5e5e5;
 }
 
-/* ==========================================
-   MODAL
-   ========================================== */
+/* ===== BADGE VERSION ===== */
+#versionBadge {
+  position: fixed;
+  bottom: 6px;
+  right: 8px;
 
-#preModalOverlay.hidden { display: none; }
+  font-size: 10px;
+  padding: 2px 6px;
 
-#preModalOverlay {
-  display: flex;
-  animation: fadeIn 0.25s ease;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+
+  border-radius: 4px;
+  z-index: 999999;
+  pointer-events: none;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-#preModal {
-  animation: popIn 0.25s ease;
-}
-
-@keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
+#sidePanel.open {
+  transform: translateX(0) !important;
 }
 
 /* ==========================================
