@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -17,7 +17,7 @@
 
   <!-- PANNEAU LATÉRAL -->
   <div id="sidePanel"
-       class="fixed top-0 left-0 h-full w-[80%] bg-white shadow-xl z-50 transition-transform duration-300">
+       class="fixed top-0 left-0 h-full w-[80%] bg-white shadow-xl z-50 transition-transform duration-300 -translate-x-full">
     
     <div class="p-4 flex flex-col gap-4">
       <h2 class="text-xl font-semibold mb-2">Menu</h2>
@@ -54,7 +54,7 @@
 
     <!-- ONGLET -->
     <div id="tabs" class="w-full flex">
-      <button class="tab-btn active flex-1 py-3 text-blue-600 border-b-4 border-blue-600">Carnet</button>
+      <button class="tab-btn active flex-1 py-3 text-[var(--carnet-main)] border-b-4 border-[#7b5d2f]">Carnet</button>
       <button class="tab-btn flex-1 py-3 text-gray-600">Photo</button>
       <button class="tab-btn flex-1 py-3 text-gray-600">Terrain</button>
       <button id="resetChat" class="tab-btn flex-1 py-3 text-gray-600">Reset</button>
@@ -81,6 +81,28 @@
       </button>
     </div>
   </div>
+
+<!-- ================================
+     MODAL PREAMBULE
+================================= -->
+<div id="preModalOverlay"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[999]">
+
+  <div id="preModal"
+     class="bg-white w-[95%] max-w-3xl mx-auto my-6 rounded-2xl p-6 relative shadow-xl overflow-y-auto max-h-[90vh]">
+
+    <!-- Bouton fermer -->
+    <button id="closePreModal"
+            class="absolute top-3 right-3 text-3xl font-bold text-gray-500 hover:text-black">
+      ×
+    </button>
+
+    <!-- CONTENU DU PRÉAMBULE, chargé dynamiquement -->
+    <div id="preContent"></div>
+
+  </div> <!-- FIN preModal -->
+
+</div> <!-- FIN overlay -->
 
   <!-- FOOTER -->
   <footer class="text-xs text-gray-500 mt-2 opacity-75 select-none">
