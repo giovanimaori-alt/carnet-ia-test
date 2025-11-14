@@ -75,7 +75,7 @@ window.addEventListener("DOMContentLoaded", () => {
   /* =====================
      BADGE VERSION
      ===================== */
-  const version = "bêta V.0.12";
+  const version = "bêta V.0.13";
 
   if (!document.getElementById("versionBadge")) {
     const badge = document.createElement("div");
