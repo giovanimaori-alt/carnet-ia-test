@@ -251,15 +251,24 @@ div, header, button, textarea {
   background: #f4f4e8 !important;
 }
 
-/* Couture fine tout autour du carnet */
+/* === CADRE CUIR TOUT AUTOUR DU CARNET === */
+.app-root {
+  position: relative;
+  border: none !important;        /* On supprime la bordure beige */
+}
+
 .app-root::before {
   content: "";
   position: absolute;
-  top: 6px;
-  bottom: 6px;
-  left: 6px;
-  right: 6px;
-  border-radius: 22px;
-  border: 2px dashed rgba(110, 60, 20, 0.9);
-  pointer-events: none;
+  top: 0; bottom: 0; left: 0; right: 0;
+
+  border-radius: 22px;           /* même arrondi que ton carnet */
+  padding: 8px;                  /* épaisseur du cadre */
+
+  background-image: url("images/cuir.png");
+  background-size: cover;        /* la texture se place proprement */
+  background-position: center;
+  background-repeat: no-repeat;
+
+  z-index: -1;                   /* reste derrière le carnet */
 }
