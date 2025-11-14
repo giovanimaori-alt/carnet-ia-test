@@ -37,43 +37,20 @@
   <!-- CARNET (→ app-root ajouté ici seulement) -->
   <div class="app-root w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-4 border-blue-600">
 
-    <header class="relative text-[#55320d] select-none"
-        style="background-image:url('images/cuir.png');
-               background-size:cover;
-               background-position:center;
-               border-bottom:3px solid rgba(0,0,0,0.25);
-               box-shadow:inset 0 -2px 3px rgba(0,0,0,0.25);">
+    <!-- HEADER -->
+    <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
 
-
-  
-
-  <!-- Contenu -->
-  <div class="flex justify-between items-center px-4 py-4 relative">
-
-      <!-- Menu -->
-      <span id="menuBtn" class="text-2xl cursor-pointer text-[#3a210a]">≡</span>
-
-      <!-- Titre + ornement -->
-      <div class="text-center leading-tight">
-        <!-- Ornement -->
-        <div class="text-sm mb-1 opacity-80">
-          &#8258; &#8258; &#8258;
-        </div>
-
-        <!-- Titre -->
-        <h1 class="text-xl font-bold drop-shadow">
-          CARNET DU NATURALISTE 
-        </h1>
+      <div class="flex items-center gap-3">
+        <span id="menuBtn" class="text-2xl cursor-pointer select-none">≡</span>
+        <h1 class="text-xl font-semibold">🌱 CARNET D’AVENTURE</h1>
       </div>
 
-      <!-- Icônes droite -->
       <div class="flex items-center gap-4">
-        <span class="text-2xl cursor-pointer">🧭</span>
-        <span id="fullscreenBtn" class="cursor-pointer text-xl">⛶</span>
+        <span class="text-2xl cursor-pointer select-none">🧭</span>
+        <span id="fullscreenBtn" class="cursor-pointer text-xl select-none">⛶</span>
       </div>
-  </div>
 
-</header>
+    </header>
 
     <!-- ONGLET -->
     <div id="tabs" class="w-full flex">
