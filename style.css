@@ -251,14 +251,6 @@ div, header, button, textarea {
   background: #f4f4e8 !important;
 }
 
-body {
-  background-image: url('images/cuir');
-  background-size: cover;
-  background-repeat: repeat;
-  background-position: center;
-  background-attachment: fixed;
-}
-
 /* Couture fine tout autour du carnet */
 .app-root::before {
   content: "";
