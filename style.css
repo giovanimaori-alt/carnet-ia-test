@@ -141,7 +141,12 @@ footer {
   text-shadow: none;
   font-size: 0.75rem;
   opacity: 0.8;
-  margin-top: 6px;
+
+  /* AJOUT → espace au-dessus */
+  margin-top: 18px;
+
+  /* AJOUT → pousse le texte plus bas dans la page */
+  padding-bottom: 10px;
 }
 
 /* --- ANIMATIONS GLOBALES --- */
