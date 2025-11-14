@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Carnet d’aventure</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Ton CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="h-screen flex flex-col justify-center items-center p-4">
+
+  <!-- PANNEAU LATÉRAL -->
+  <div id="sidePanel"
+       class="fixed top-0 left-0 h-full w-[80%] bg-white shadow-xl z-50 transition-transform duration-300 -translate-x-full">
+    
+    <div class="p-4 flex flex-col gap-4">
+      <h2 class="text-xl font-semibold mb-2">Menu</h2>
+
+      <button class="panel-btn">Mode Randonneur</button>
+      <button class="panel-btn">Mode Famille</button>
+      <button class="panel-btn">Mode Scolaire</button>
+      <button class="panel-btn">Mode Enseignant</button>
+
+      <hr class="my-2">
+
+      <button class="panel-btn">Préambule</button>
+      <button class="panel-btn">À propos</button>
+    </div>
+  </div>
+
+  <!-- CARNET (→ app-root ajouté ici seulement) -->
+  <div class="app-root w-full max-w-md h-full max-h-[700px] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden border-4 border-blue-600">
+
+    <!-- HEADER -->
+    <header class="bg-blue-600 text-white py-4 px-6 flex justify-between items-center">
+
+      <div class="flex items-center gap-3">
+        <span id="menuBtn" class="text-2xl cursor-pointer select-none">≡</span>
+        <h1 class="text-xl font-semibold">🌱 CARNET D’AVENTURE</h1>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <span class="text-2xl cursor-pointer select-none">🧭</span>
+        <span id="fullscreenBtn" class="cursor-pointer text-xl select-none">⛶</span>
+      </div>
+
+    </header>
+
+    <!-- ONGLET -->
+    <div id="tabs" class="w-full flex">
+      <button class="tab-btn active flex-1 py-3 text-[var(--carnet-main)] border-b-4 border-[#7b5d2f]">Carnet</button>
+      <button class="tab-btn flex-1 py-3 text-gray-600">Photo</button>
+      <button class="tab-btn flex-1 py-3 text-gray-600">Terrain</button>
+      <button id="resetChat" class="tab-btn flex-1 py-3 text-gray-600">Reset</button>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat" class="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-gray-50">
+      <div class="flex items-start gap-2">
+        <div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+        <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl max-w-[75%]">
+          Salut, j'écoute. Envoie un message quand tu veux.
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="border-t p-4 bg-white flex items-center gap-3">
+      <textarea id="input" class="flex-1 border rounded-xl p-3 resize-none h-12 focus:ring-2 focus:ring-blue-600 outline-none"
+        placeholder="Écris un message..."></textarea>
+
+      <button id="send"
+        class="bg-blue-600 hover:bg-blue-700 transition text-white px-4 py-3 rounded-xl text-sm font-semibold">
+        ➤
+      </button>
+    </div>
+
+  </div> <!-- FIN app-root -->
+
+<!-- ================================
+     MODAL PREAMBULE
+================================= -->
+<div id="preModalOverlay"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-[999]">
+
+  <div id="preModal"
+     class="bg-white w-[95%] max-w-3xl mx-auto my-6 rounded-2xl p-6 relative shadow-xl overflow-y-auto max-h-[90vh]">
+
+    <!-- Bouton fermer -->
+    <button id="closePreModal"
+            class="absolute top-3 right-3 text-3xl font-bold text-gray-500 hover:text-black">
+      ×
+    </button>
+
+    <!-- CONTENU DU PRÉAMBULE, chargé dynamiquement -->
+    <div id="preContent"></div>
+
+  </div> <!-- FIN preModal -->
+
+</div> <!-- FIN overlay -->
+
+  <!-- FOOTER -->
+  <footer class="text-xs text-gray-500 mt-2 opacity-75 select-none">
+    © Conservatoire du Canigou
+  </footer>
+
+  <!-- JS EXTERNES -->
+  <script src="gemini.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
