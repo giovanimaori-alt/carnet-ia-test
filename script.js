@@ -84,6 +84,28 @@ window.addEventListener("DOMContentLoaded", () => {
     document.body.appendChild(badge);
   }
 
+/* ===========================
+   FULLSCREEN (iPhone friendly)
+   =========================== */
+const fullBtn = document.getElementById("fullscreenBtn");
+const appRoot = document.querySelector(".app-root"); // conteneur principal
+
+if (fullBtn && appRoot) {
+  let isFull = false;
+
+  fullBtn.addEventListener("click", () => {
+    isFull = !isFull;
+
+    if (isFull) {
+      appRoot.classList.add("fullscreen-active");
+      fullBtn.textContent = "×";   // icône pour quitter
+    } else {
+      appRoot.classList.remove("fullscreen-active");
+      fullBtn.textContent = "⛶";  // icône pour entrer
+    }
+  });
+}
+
 }); // FIN DOMContentLoaded
 
 /* ===========================
